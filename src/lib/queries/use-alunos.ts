@@ -4,14 +4,14 @@ import { useStudentsStore } from '@/lib/store/alunos-store';
 import type { Aluno, StatusPagamento } from '@/types';
 
 export function useAlunos() {
-  const alunos = useStudentsStore((s) => s.alunos);
   return useQuery({
-    queryKey: ['alunos', alunos.length],
+    queryKey: ['alunos'],
     queryFn: async () => {
-      await new Promise((r) => setTimeout(r, 300));
-      return alunos;
+      const resposta = await fetch('/api/alunos');
+      if (!resposta.ok) throw new Error('Falha ao buscar alunos do servidor.');
+      return resposta.json() as Promise<Aluno[]>;
     },
-    staleTime: Infinity,
+    staleTime: 30_000,
   });
 }
 
@@ -59,10 +59,23 @@ export function useStudentsByProfessor(professorId: string) {
 export function useUpdatePaymentStatus() {
   const queryClient = useQueryClient();
   const updatePaymentStatus = useStudentsStore((s) => s.updatePaymentStatus);
+
   return useMutation({
     mutationFn: async ({ id, status }: { id: string; status: StatusPagamento }) => {
-      await new Promise((r) => setTimeout(r, 500));
+      const resposta = await fetch('/api/alunos', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id, status }),
+      });
+
+      if (!resposta.ok) {
+        throw new Error('Falha ao atualizar o status de pagamento no servidor.');
+      }
+
       updatePaymentStatus(id, status);
+      
       return { id, status };
     },
     onSuccess: () => {

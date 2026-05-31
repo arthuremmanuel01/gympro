@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useAlunos, useUpdatePaymentStatus } from '@/lib/queries/use-alunos';
 import { SkeletonList } from '@/components/ui/skeleton';
@@ -7,7 +7,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar } from '@/components/shared/avatar';
 import { PageHeader } from '@/components/shared/page-header';
-import { MOCK_FINANCIAL_SUMMARY } from '@/lib/mock-data';
 import { formatCurrency, formatDate, getPaymentStatusBg, getPaymentStatusLabel } from '@/lib/utils';
 import { CheckCircle2, AlertCircle, Clock, DollarSign } from 'lucide-react';
 import type { StatusPagamento } from '@/types';
@@ -17,8 +16,21 @@ export default function FinanceiroPage() {
   const { mutate: updateStatus, isPending } = useUpdatePaymentStatus();
   const [filter, setFilter] = useState<StatusPagamento | 'todos'>('todos');
   const [updating, setUpdating] = useState<string | null>(null);
+
   const filtered = filter === 'todos' ? alunos : alunos?.filter((s) => s.statusPagamento === filter);
-  const fs = MOCK_FINANCIAL_SUMMARY;
+
+  const fs = useMemo(() => {
+    if (!alunos) return { receitaMensalBRL: 0, adimplentes: 0, inadimplentes: 0, pendentes: 0 };
+
+    return {
+      receitaMensalBRL: alunos
+        .filter((a) => a.statusPagamento === 'adimplente')
+        .reduce((acc, cur) => acc + cur.mensalidade, 0),
+      adimplentes: alunos.filter((a) => a.statusPagamento === 'adimplente').length,
+      inadimplentes: alunos.filter((a) => a.statusPagamento === 'inadimplente').length,
+      pendentes: alunos.filter((a) => a.statusPagamento === 'pendente').length,
+    };
+  }, [alunos]);
 
   function handleUpdateStatus(alunoId: string, status: StatusPagamento) {
     setUpdating(alunoId);

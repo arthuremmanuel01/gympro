@@ -1,5 +1,5 @@
 'use client';
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -7,17 +7,17 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Mail, Lock, Eye, EyeOff, ArrowLeft, User } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowLeft, User, Phone, FileText } from 'lucide-react';
 import Link from 'next/link';
 import type { Perfil } from '@/types';
 
-const registerSchema = z.object({
-  name: z.string().min(3, 'O nome deve ter no mínimo 3 caracteres'),
-  email: z.string().email('E-mail inválido').min(1, 'E-mail é obrigatório'),
-  password: z.string().min(4, 'A senha deve ter no mínimo 4 caracteres'),
-});
-
-type RegisterFormData = z.infer<typeof registerSchema>;
+interface RegisterFormData {
+  name: string;
+  email: string;
+  password: string;
+  phone: string | undefined;
+  cpf: string | undefined;
+} 
 
 const roleConfig: Record<Perfil, { label: string; color: string }> = {
   aluno: { label: 'Aluno', color: 'var(--color-primary)' },
@@ -35,6 +35,16 @@ function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const registerSchema = useMemo(() => {
+    return z.object({
+      name: z.string().min(3, 'O nome deve ter no mínimo 3 caracteres'),
+      email: z.string().email('E-mail inválido').min(1, 'E-mail é obrigatório'),
+      password: z.string().min(4, 'A senha deve ter no mínimo 4 caracteres'),
+      phone: role === 'aluno' ? z.string().min(10, 'O telefone deve ter no mínimo 10 dígitos') : z.string().optional(),
+      cpf: role === 'aluno' ? z.string().min(11, 'O CPF deve ter no mínimo 11 dígitos') : z.string().optional(),
+    });
+  }, [role]);
 
   const { register, handleSubmit, formState: { errors } } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -85,6 +95,14 @@ function RegisterForm() {
         <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
           <Input id="register-name" label="Nome completo" type="text" placeholder="Seu nome completo" leftIcon={<User className="h-4 w-4" />} error={errors.name?.message} {...register('name')} />
           <Input id="register-email" label="E-mail" type="email" inputMode="email" placeholder="seu@email.com" leftIcon={<Mail className="h-4 w-4" />} error={errors.email?.message} {...register('email')} />
+          
+          {role === 'aluno' && (
+            <>
+              <Input id="register-phone" label="Telefone" type="tel" placeholder="(00) 00000-0000" leftIcon={<Phone className="h-4 w-4" />} error={errors.phone?.message} {...register('phone')} />
+              <Input id="register-cpf" label="CPF" type="text" placeholder="000.000.000-00" leftIcon={<FileText className="h-4 w-4" />} error={errors.cpf?.message} {...register('cpf')} />
+            </>
+          )}
+
           <Input id="register-password" label="Senha" type={showPassword ? 'text' : 'password'} placeholder="••••••" leftIcon={<Lock className="h-4 w-4" />} rightIcon={
               <button type="button" onClick={() => setShowPassword((v) => !v)} className="h-6 w-6 flex items-center justify-center">
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
