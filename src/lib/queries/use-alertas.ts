@@ -31,13 +31,39 @@ export function useAlertsForRole(role: Perfil) {
 
 export function useMarkAlertRead() {
   const queryClient = useQueryClient();
-  const marcarComoLido = useAlertsStore((s) => s.marcarComoLido);
+  const fetchAlerts = useAlertsStore((s) => s.fetchAlerts);
+
   return useMutation({
     mutationFn: async (id: string) => {
-      marcarComoLido(id);
-      return id;
+      const resposta = await fetch('/api/alertas', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
+      if (!resposta.ok) throw new Error('Falha ao marcar alerta como lido.');
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      await fetchAlerts();
+      queryClient.invalidateQueries({ queryKey: ['alertas'] });
+    },
+  });
+}
+
+export function useMarkAllAlertsRead() {
+  const queryClient = useQueryClient();
+  const fetchAlerts = useAlertsStore((s) => s.fetchAlerts);
+
+  return useMutation({
+    mutationFn: async () => {
+      const resposta = await fetch('/api/alertas', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'mark_all' }),
+      });
+      if (!resposta.ok) throw new Error('Falha ao marcar todos como lido.');
+    },
+    onSuccess: async () => {
+      await fetchAlerts();
       queryClient.invalidateQueries({ queryKey: ['alertas'] });
     },
   });
@@ -45,14 +71,23 @@ export function useMarkAlertRead() {
 
 export function useAddAlert() {
   const queryClient = useQueryClient();
-  const addAlert = useAlertsStore((s) => s.addAlert);
+  const fetchAlerts = useAlertsStore((s) => s.fetchAlerts); 
+
   return useMutation({
     mutationFn: async (alert: Omit<AlertaAcademia, 'id' | 'criadoEm'>) => {
-      await new Promise((r) => setTimeout(r, 500));
-      addAlert(alert);
-      return alert;
+      const resposta = await fetch('/api/alertas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(alert),
+      });
+
+      if (!resposta.ok) {
+        throw new Error('Falha ao criar o alerta no servidor.');
+      }
+      return resposta.json();
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      await fetchAlerts(); 
       queryClient.invalidateQueries({ queryKey: ['alertas'] });
     },
   });

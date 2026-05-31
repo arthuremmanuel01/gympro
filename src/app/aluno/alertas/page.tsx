@@ -1,7 +1,7 @@
 'use client';
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useAlertsForRole } from '@/lib/queries/use-alertas';
-import { useMarkAlertRead } from '@/lib/queries/use-alertas';
+import { useAlertsForRole, useMarkAlertRead, useMarkAllAlertsRead } from '@/lib/queries/use-alertas';
 import { useAlertsStore } from '@/lib/store/alertas-store';
 import { SkeletonList } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
@@ -21,7 +21,12 @@ function AlertIcon({ type }: { type: TipoAlerta }) {
 export default function AlertasAlunoPage() {
   const { data: alertas, isLoading: carregando } = useAlertsForRole('aluno');
   const { mutate: markRead } = useMarkAlertRead();
-  const marcarTodosComoLidos = useAlertsStore((s) => s.marcarTodosComoLidos);
+  const { mutate: markAllRead } = useMarkAllAlertsRead();
+  const fetchAlerts = useAlertsStore((s) => s.fetchAlerts);
+
+  useEffect(() => {
+    fetchAlerts();
+  }, [fetchAlerts]);
 
   if (carregando) return <SkeletonList count={4} />;
 
@@ -38,7 +43,7 @@ export default function AlertasAlunoPage() {
               variant="ghost"
               size="sm"
               leftIcon={<CheckCheck className="h-3.5 w-3.5" />}
-              onClick={marcarTodosComoLidos}
+              onClick={() => markAllRead()} 
             >
               Marcar todos
             </Button>

@@ -1,5 +1,6 @@
 'use client';
 import { motion } from 'framer-motion';
+import { useEffect } from 'react';
 import { useAutenticacaoStore } from '@/lib/store/auth-store';
 import { useStudentsByProfessor } from '@/lib/queries/use-alunos';
 import { useAlertsStore } from '@/lib/store/alertas-store';
@@ -14,7 +15,13 @@ import Link from 'next/link';
 export default function ProfessorDashboardPage() {
   const { user } = useAutenticacaoStore();
   const { data: alunos, isLoading: carregando } = useStudentsByProfessor(user?.id ?? '');
+  
+  const fetchAlerts = useAlertsStore((s) => s.fetchAlerts);
   const quantidadeNaoLida = useAlertsStore((s) => s.getUnreadCount)();
+
+  useEffect(() => {
+    fetchAlerts();
+  }, [fetchAlerts]);
 
   const container = {
     hidden: { opacity: 0 },

@@ -44,16 +44,15 @@ export function useAlunoPorUsuarioId(usuarioId: string) {
 }
 
 export function useStudentsByProfessor(professorId: string) {
-  const alunos = useStudentsStore((s) => s.alunos);
-  const filtered = alunos.filter((s) => s.professorId === professorId);
   return useQuery({
-    queryKey: ['alunos', 'by-professor', professorId, filtered.length],
+    queryKey: ['alunos', 'by-professor', professorId],
     queryFn: async () => {
-      await new Promise((r) => setTimeout(r, 300));
-      return filtered;
+      const resposta = await fetch(`/api/alunos?professorId=${professorId}`);
+      if (!resposta.ok) throw new Error('Falha ao buscar os alunos do servidor.');
+      return resposta.json() as Promise<Aluno[]>;
     },
     enabled: Boolean(professorId),
-    staleTime: Infinity,
+    staleTime: 30_000,
   });
 }
 
