@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Usuario, Perfil } from '@/types';
-import { MOCK_USERS, MOCK_CREDENTIALS } from '@/lib/mock-data';
 
 function setAuthCookie(role: Perfil | null) {
   if (typeof document === 'undefined') return;
@@ -18,7 +17,7 @@ interface AuthStore {
   carregando: boolean;
 
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  loginAsRole: (role: Perfil) => void;
+  loginAsRole: (role: Perfil) => Promise<void>;
   logout: () => void;
   setLoading: (loading: boolean) => void;
 }
@@ -32,30 +31,49 @@ export const useAutenticacaoStore = create<AuthStore>()(
 
       login: async (email, password) => {
         set({ carregando: true });
-        await new Promise((resolve) => setTimeout(resolve, 800));
+        try {
+          const resposta = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password }),
+          });
 
-        const credential = MOCK_CREDENTIALS[email.toLowerCase()];
-        if (!credential || credential.password !== password) {
+          const dados = await resposta.json();
+
+          if (!resposta.ok || !dados.success) {
+            set({ carregando: false });
+            return { success: false, error: dados.error || 'Falha na autenticação.' };
+          }
+
+          set({ user: dados.user, estaAutenticado: true, carregando: false });
+          setAuthCookie(dados.user.role);
+          return { success: true };
+        } catch (error) {
           set({ carregando: false });
-          return { success: false, error: 'E-mail ou senha incorretos.' };
+          return { success: false, error: 'Erro de conexão com o servidor.' };
         }
-
-        const user = MOCK_USERS.find((u) => u.id === credential.usuarioId);
-        if (!user) {
-          set({ carregando: false });
-          return { success: false, error: 'Usuário não encontrado.' };
-        }
-
-        set({ user, estaAutenticado: true, carregando: false });
-        setAuthCookie(user.role);
-        return { success: true };
       },
 
-      loginAsRole: (role) => {
-        const user = MOCK_USERS.find((u) => u.role === role);
-        if (user) {
-          set({ user, estaAutenticado: true });
-          setAuthCookie(user.role);
+      loginAsRole: async (role) => {
+        set({ carregando: true });
+        try {
+          const resposta = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ role }),
+          });
+
+          const dados = await resposta.json();
+
+          if (resposta.ok && dados.success && dados.user) {
+            set({ user: dados.user, estaAutenticado: true, carregando: false });
+            setAuthCookie(dados.user.role);
+          } else {
+            set({ carregando: false });
+          }
+        } catch (error) {
+          set({ carregando: false });
+          console.error('Erro ao alternar perfil:', error);
         }
       },
 
