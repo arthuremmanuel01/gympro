@@ -208,6 +208,17 @@ function LoginForm() {
           >
             Entrar
           </Button>
+          
+          <div className="mt-6 text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>
+            Ainda não tem conta?{' '}
+            <Link
+              href={`/auth/register?role=${role}`}
+              className="font-medium hover:underline transition-all"
+              style={{ color: config.color }}
+            >
+              Cadastre-se como {config.label}
+            </Link>
+          </div>
         </form>
       </motion.div>
     </main>
