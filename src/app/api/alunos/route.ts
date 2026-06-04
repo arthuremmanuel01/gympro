@@ -4,11 +4,20 @@ import { db } from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
+  const id = searchParams.get('id');
   const professorId = searchParams.get('professorId');
   const cpf = searchParams.get('cpf');
   const usuarioId = searchParams.get('usuarioId');
 
   try {
+    if (id) {
+      const result = await db.execute({
+        sql: 'SELECT * FROM alunos WHERE id = ? LIMIT 1',
+        args: [id],
+      });
+      return NextResponse.json(result.rows[0] || null);
+    }
+
     if (cpf) {
       const result = await db.execute({
         sql: 'SELECT * FROM alunos WHERE cpf = ? LIMIT 1',

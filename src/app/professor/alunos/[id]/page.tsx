@@ -2,7 +2,7 @@
 import { use, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useStudent } from '@/lib/queries/use-alunos';
-import { usePlanoTreino, useUpdateWorkoutPlan } from '@/lib/queries/use-treinos';
+import { usePlanoTreino, useUpdateWorkoutPlan, useAddWorkoutPlan } from '@/lib/queries/use-treinos';
 import { SkeletonCard } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -26,23 +26,32 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import Link from 'next/link';
-import type { Exercicio } from '@/types';
+import type { Exercicio, PlanoTreino, DificuldadeTreino } from '@/types';
 
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-function generateId() {
-  return `ex-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+function generateId(prefix: string) {
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
 export default function StudentDetailPage({ params }: PageProps) {
   const { id } = use(params);
   const { data: student, isLoading: loadingStudent } = useStudent(id);
   const { data: plan, isLoading: loadingPlan } = usePlanoTreino(student?.planoTreinoAtivoId);
-  const { mutate: updatePlan, isPending } = useUpdateWorkoutPlan();
+  const { mutate: updatePlan } = useUpdateWorkoutPlan();
+  const { mutate: createPlan, isPending: criandoPlano } = useAddWorkoutPlan();
 
   const [addExModal, setAddExModal] = useState(false);
+  const [createPlanModal, setCreatePlanModal] = useState(false);
+  
+  const [newPlan, setNewPlan] = useState({
+    name: '',
+    dificuldade: 'intermediario' as DificuldadeTreino,
+    diasPorSemana: 3,
+  });
+
   const [newEx, setNewEx] = useState<Partial<Exercicio>>({
     name: '',
     grupoMuscular: '',
@@ -53,10 +62,38 @@ export default function StudentDetailPage({ params }: PageProps) {
     notes: '',
   });
 
+  function handleCreatePlan() {
+    if (!student || !newPlan.name) return;
+    
+    const planoId = generateId('plan');
+    const dataAtual = new Date().toISOString();
+    
+    const novoPlano: PlanoTreino = {
+      id: planoId,
+      name: newPlan.name,
+      alunoId: student.id,
+      professorId: student.professorId || '',
+      dificuldade: newPlan.dificuldade,
+      diasPorSemana: newPlan.diasPorSemana,
+      exercicios: [],
+      criadoEm: dataAtual,
+      atualizadoEm: dataAtual,
+      ativo: true,
+    };
+
+    createPlan(novoPlano, {
+      onSuccess: () => {
+        setCreatePlanModal(false);
+        setNewPlan({ name: '', dificuldade: 'intermediario', diasPorSemana: 3 });
+        window.location.reload();
+      }
+    });
+  }
+
   function handleAddExercise() {
     if (!plan || !newEx.name || !newEx.grupoMuscular) return;
     const exercise: Exercicio = {
-      id: generateId(),
+      id: generateId('ex'),
       name: newEx.name ?? '',
       grupoMuscular: newEx.grupoMuscular ?? '',
       sets: newEx.sets ?? 3,
@@ -128,13 +165,12 @@ export default function StudentDetailPage({ params }: PageProps) {
         </Card>
       </motion.div>
 
-      {/* Plano de treino */}
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-semibold" style={{ color: 'var(--color-text-secondary)' }}>
             Ficha de Treino
           </h2>
-          {plan && (
+          {plan ? (
             <Button
               variant="ghost"
               size="sm"
@@ -142,6 +178,15 @@ export default function StudentDetailPage({ params }: PageProps) {
               onClick={() => setAddExModal(true)}
             >
               Adicionar Exercício
+            </Button>
+          ) : (
+            <Button
+              variant="primary"
+              size="sm"
+              leftIcon={<Plus className="h-3.5 w-3.5" />}
+              onClick={() => setCreatePlanModal(true)}
+            >
+              Criar Nova Ficha
             </Button>
           )}
         </div>
@@ -210,7 +255,56 @@ export default function StudentDetailPage({ params }: PageProps) {
         )}
       </motion.div>
 
-      {/* Add Exercicio Modal */}
+      <Modal
+        isOpen={createPlanModal}
+        onClose={() => setCreatePlanModal(false)}
+        title="Criar Ficha de Treino"
+      >
+        <div className="space-y-4">
+          <Input
+            id="plan-name"
+            label="Nome da Ficha"
+            placeholder="Ex: Treino A - Hipertrofia"
+            value={newPlan.name}
+            onChange={(e) => setNewPlan((v) => ({ ...v, name: e.target.value }))}
+          />
+          <div className="space-y-1">
+            <label className="text-xs font-semibold" style={{ color: 'var(--color-text-secondary)' }}>Dificuldade</label>
+            <select
+              className="w-full p-2.5 rounded-lg border text-sm"
+              style={{ background: 'var(--color-bg-elevated)', borderColor: 'var(--color-border)' }}
+              value={newPlan.dificuldade}
+              onChange={(e) => setNewPlan((v) => ({ ...v, dificuldade: e.target.value as DificuldadeTreino }))}
+            >
+              <option value="iniciante">Iniciante</option>
+              <option value="intermediario">Intermediário</option>
+              <option value="avancado">Avançado</option>
+            </select>
+          </div>
+          <Input
+            id="plan-days"
+            label="Frequência Semanal (Dias)"
+            type="number"
+            inputMode="numeric"
+            value={newPlan.diasPorSemana}
+            onChange={(e) => setNewPlan((v) => ({ ...v, diasPorSemana: Number(e.target.value) }))}
+          />
+          <div className="flex gap-3 mt-2">
+            <Button variant="outline" className="flex-1" onClick={() => setCreatePlanModal(false)}>
+              Cancelar
+            </Button>
+            <Button
+              className="flex-1"
+              onClick={handleCreatePlan}
+              carregando={criandoPlano}
+              disabled={!newPlan.name}
+            >
+              Criar Ficha
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
       <Modal
         isOpen={addExModal}
         onClose={() => setAddExModal(false)}
@@ -281,7 +375,6 @@ export default function StudentDetailPage({ params }: PageProps) {
             <Button
               className="flex-1"
               onClick={handleAddExercise}
-              carregando={isPending}
               disabled={!newEx.name || !newEx.grupoMuscular}
             >
               Adicionar Exercício

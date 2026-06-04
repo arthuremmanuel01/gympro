@@ -16,30 +16,32 @@ export function useAlunos() {
 }
 
 export function useStudent(id: string) {
-  const alunos = useStudentsStore((s) => s.alunos);
-  const student = alunos.find((s) => s.id === id) ?? null;
   return useQuery({
-    queryKey: ['alunos', id, student?.statusPagamento],
+    queryKey: ['alunos', id],
     queryFn: async () => {
-      await new Promise((r) => setTimeout(r, 200));
-      return student;
+      const resposta = await fetch(`/api/alunos?id=${encodeURIComponent(id)}`);
+      if (!resposta.ok) {
+        throw new Error('Falha ao buscar os detalhes do aluno no servidor.');
+  }
+      return resposta.json() as Promise<Aluno | null>;
     },
     enabled: Boolean(id),
-    staleTime: Infinity,
+    staleTime: 30_000,
   });
 }
 
 export function useAlunoPorUsuarioId(usuarioId: string) {
-  const alunos = useStudentsStore((s) => s.alunos);
-  const student = alunos.find((s) => s.usuarioId === usuarioId) ?? null;
   return useQuery({
-    queryKey: ['alunos', 'by-user', usuarioId, student?.statusPagamento],
+    queryKey: ['alunos', 'by-user', usuarioId],
     queryFn: async () => {
-      await new Promise((r) => setTimeout(r, 200));
-      return student;
+      const resposta = await fetch(`/api/alunos?usuarioId=${encodeURIComponent(usuarioId)}`);
+      if (!resposta.ok) {
+        throw new Error('Falha ao buscar o aluno por ID de usuário no servidor.');
+      }
+      return resposta.json() as Promise<Aluno | null>;
     },
     enabled: Boolean(usuarioId),
-    staleTime: Infinity,
+    staleTime: 30_000,
   });
 }
 

@@ -16,16 +16,15 @@ export function usePlanosTreino() {
 }
 
 export function usePlanoTreino(planId: string | undefined) {
-  const planos = useTreinoStore((s) => s.planos);
-  const plan = planId ? planos.find((p) => p.id === planId) ?? null : null;
   return useQuery({
-    queryKey: ['workout-planos', planId, plan?.exercicios.length],
+    queryKey: ['workout-planos', planId],
     queryFn: async () => {
-      await new Promise((r) => setTimeout(r, 200));
-      return plan;
+      const resposta = await fetch(`/api/planos-treino?id=${planId}`);
+      if (!resposta.ok) throw new Error('Falha ao buscar o plano de treino do servidor.');
+      return resposta.json() as Promise<PlanoTreino | null>;
     },
     enabled: Boolean(planId),
-    staleTime: Infinity,
+    staleTime: 10_000,
   });
 }
 
@@ -46,14 +45,27 @@ export function useWorkoutPlansByStudent(alunoId: string) {
 export function useUpdateWorkoutPlan() {
   const queryClient = useQueryClient();
   const updatePlan = useTreinoStore((s) => s.updatePlan);
+
   return useMutation({
     mutationFn: async (plan: PlanoTreino) => {
-      await new Promise((r) => setTimeout(r, 500));
+      const resposta = await fetch('/api/planos-treino', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(plan),
+      });
+
+      if (!resposta.ok) {
+        throw new Error('Falha ao atualizar o plano de treino no servidor.');
+      }
+
       updatePlan(plan);
       return plan;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['workout-planos'] });
+      queryClient.invalidateQueries({ queryKey: ['workout-planos', data.id] });
     },
   });
 }
@@ -61,14 +73,27 @@ export function useUpdateWorkoutPlan() {
 export function useAddWorkoutPlan() {
   const queryClient = useQueryClient();
   const addPlan = useTreinoStore((s) => s.addPlan);
+
   return useMutation({
     mutationFn: async (plan: PlanoTreino) => {
-      await new Promise((r) => setTimeout(r, 600));
+      const resposta = await fetch('/api/planos-treino', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(plan),
+      });
+
+      if (!resposta.ok) {
+        throw new Error('Falha ao criar o plano de treino no servidor.');
+      }
+
       addPlan(plan);
       return plan;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workout-planos'] });
+      queryClient.invalidateQueries({ queryKey: ['alunos'] });
     },
   });
 }
