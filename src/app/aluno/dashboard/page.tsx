@@ -165,7 +165,9 @@ export default function AlunoDashboardPage() {
               </div>
               <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Streaks</span>
             </div>
-            <p className="text-2xl font-black" style={{ color: 'var(--color-text-primary)' }}>7</p>
+            <p className="text-2xl font-black" style={{ color: 'var(--color-text-primary)' }}>
+              {loadingStudent ? '...' : student?.streak ?? 0}
+            </p>
             <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>dias seguidos</p>
           </CardContent>
         </Card>
@@ -181,7 +183,9 @@ export default function AlunoDashboardPage() {
               </div>
               <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Este mês</span>
             </div>
-            <p className="text-2xl font-black" style={{ color: 'var(--color-text-primary)' }}>18</p>
+            <p className="text-2xl font-black" style={{ color: 'var(--color-text-primary)' }}>
+              {loadingStudent ? '...' : student?.treinosMes ?? 0}
+            </p>
             <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>treinos feitos</p>
           </CardContent>
         </Card>
