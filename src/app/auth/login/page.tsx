@@ -59,7 +59,9 @@ function LoginForm() {
   });
 
   useEffect(() => {
-    if (estaAutenticado && user) {
+    const temCookieSessao = typeof document !== 'undefined' && document.cookie.includes('gympro-auth-role');
+
+    if (estaAutenticado && user && temCookieSessao) {
       const dashMap: Record<Perfil, string> = {
         aluno: '/aluno/dashboard',
         professor: '/professor/dashboard',
