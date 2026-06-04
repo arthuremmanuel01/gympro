@@ -81,6 +81,8 @@ export interface Aluno {
   professorId: string;
   contatoEmergencia?: string;
   observacoesMedicas?: string;
+  solicitacaoProfessorId?: string | null;
+  nomeProfessorSolicitante?: string | null;
 }
 
 export interface Equipamento {

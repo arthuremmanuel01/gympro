@@ -30,8 +30,9 @@ export async function inicializarSchema(): Promise<void> {
         id TEXT PRIMARY KEY, usuarioId TEXT NOT NULL, name TEXT NOT NULL, email TEXT NOT NULL,
         phone TEXT NOT NULL, cpf TEXT NOT NULL, statusPagamento TEXT NOT NULL,
         mensalidade REAL NOT NULL, diaVencimento INTEGER NOT NULL, matriculadoEm TEXT NOT NULL,
-        ultimoPagamentoEm TEXT, planoTreinoAtivoId TEXT, professorId TEXT NOT NULL,
+        ultimoPagamentoEm TEXT, planoTreinoAtivoId TEXT, professorId TEXT,
         contatoEmergencia TEXT, observacoesMedicas TEXT,
+        solicitacaoProfessorId TEXT, nomeProfessorSolicitante TEXT,
         FOREIGN KEY(usuarioId) REFERENCES usuarios(id)
       );
     `);
