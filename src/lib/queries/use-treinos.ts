@@ -112,3 +112,26 @@ export function useDeleteWorkoutPlan() {
     },
   });
 }
+
+export function useConcluirTreino() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: { alunoId: string; planoTreinoId: string; exerciciosConcluidos: string[] }) => {
+      const resposta = await fetch('/api/treinos/concluir', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (!resposta.ok) {
+        throw new Error('Falha ao concluir o treino no servidor.');
+      }
+
+      return resposta.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['alunos'] });
+    },
+  });
+}

@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAutenticacaoStore } from '@/lib/store/auth-store';
-import { usePlanoTreino } from '@/lib/queries/use-treinos';
+import { usePlanoTreino, useConcluirTreino } from '@/lib/queries/use-treinos';
 import { useTreinoStore } from '@/lib/store/treino-store';
 import { useCountdown } from '@/hooks/use-countdown';
 import { SkeletonList } from '@/components/ui/skeleton';
@@ -31,6 +31,27 @@ export default function TreinoPage() {
   const [currentExIndex, setCurrentExIndex] = useState(0);
   const [restingFor, setRestingFor] = useState<string | null>(null);
 
+  const { mutateAsync: concluirTreino, isPending: finalizando } = useConcluirTreino();
+
+  async function handleFinalizarTreino() {
+    if (!student || !plan) return;
+
+    try {
+      await concluirTreino({
+        alunoId: student.id,
+        planoTreinoId: plan.id,
+        exerciciosConcluidos: Object.keys(progressoExercicio),
+      });
+
+      alert('Treino finalizado com sucesso! Bom descanso.');
+      reiniciarSessao(plan.exercicios);
+      setCurrentExIndex(0);
+    } catch (error) {
+      console.error(error);
+      alert('Erro ao salvar o treino. Tente novamente.');
+    }
+  }
+
   async function carregarDadosAluno() {
     if (!user?.id) return;
     try {
@@ -49,6 +70,10 @@ export default function TreinoPage() {
   useEffect(() => {
     carregarDadosAluno();
   }, [user?.id]);
+
+  const isWorkoutComplete = plan?.exercicios.every(
+    (ex) => (progressoExercicio[ex.id] ?? 0) >= ex.sets
+  );
 
   async function handleAcaoVinculo(action: 'aceitar' | 'recusar') {
     if (!student) return;
@@ -128,7 +153,7 @@ export default function TreinoPage() {
                 variant="ghost"
                 size="sm"
                 leftIcon={<RotateCcw className="h-3.5 w-3.5" />}
-                onClick={() => reiniciarSessao(plan.id)}
+                onClick={() => reiniciarSessao(plan.exercicios)} // <- Alterado aqui
               >
                 Reiniciar
               </Button>
@@ -320,6 +345,19 @@ export default function TreinoPage() {
               );
             })}
           </div>
+          {isWorkoutComplete && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="pt-4">
+              <Button
+                size="lg"
+                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white disabled:opacity-50"
+                onClick={handleFinalizarTreino}
+                disabled={finalizando}
+              >
+                <CheckCircle2 className="h-5 w-5 mr-2" />
+                {finalizando ? 'Salvando...' : 'Finalizar Treino e Salvar'}
+              </Button>
+            </motion.div>
+          )}
         </>
       )}
     </div>

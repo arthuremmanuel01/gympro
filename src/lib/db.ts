@@ -27,12 +27,16 @@ export async function inicializarSchema(): Promise<void> {
 
     await db.execute(`
       CREATE TABLE IF NOT EXISTS alunos (
-        id TEXT PRIMARY KEY, usuarioId TEXT NOT NULL, name TEXT NOT NULL, email TEXT NOT NULL,
-        phone TEXT NOT NULL, cpf TEXT NOT NULL, statusPagamento TEXT NOT NULL,
-        mensalidade REAL NOT NULL, diaVencimento INTEGER NOT NULL, matriculadoEm TEXT NOT NULL,
-        ultimoPagamentoEm TEXT, planoTreinoAtivoId TEXT, professorId TEXT,
+        id TEXT PRIMARY KEY, usuarioId TEXT NOT NULL, name TEXT NOT NULL,
+        email TEXT NOT NULL, phone TEXT NOT NULL, cpf TEXT NOT NULL,
+        avatarUrl TEXT, statusPagamento TEXT NOT NULL,
+        mensalidade REAL NOT NULL, diaVencimento INTEGER NOT NULL,
+        matriculadoEm TEXT NOT NULL, ultimoPagamentoEm TEXT,
+        planoTreinoAtivoId TEXT, professorId TEXT,
         contatoEmergencia TEXT, observacoesMedicas TEXT,
         solicitacaoProfessorId TEXT, nomeProfessorSolicitante TEXT,
+        streak INTEGER DEFAULT 0, treinosMes INTEGER DEFAULT 0,
+        ultimoTreinoEm TEXT,
         FOREIGN KEY(usuarioId) REFERENCES usuarios(id)
       );
     `);
@@ -42,6 +46,15 @@ export async function inicializarSchema(): Promise<void> {
         id TEXT PRIMARY KEY, name TEXT NOT NULL, alunoId TEXT NOT NULL, professorId TEXT NOT NULL,
         dificuldade TEXT NOT NULL, diasPorSemana INTEGER NOT NULL, exercicios TEXT NOT NULL,
         criadoEm TEXT NOT NULL, atualizadoEm TEXT NOT NULL, ativo INTEGER NOT NULL
+      );
+    `);
+
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS sessoes_treino (
+        id TEXT PRIMARY KEY, alunoId TEXT NOT NULL, planoTreinoId TEXT NOT NULL,
+        iniciadoEm TEXT NOT NULL, concluidoEm TEXT, exerciciosConcluidos TEXT NOT NULL,
+        FOREIGN KEY(alunoId) REFERENCES alunos(id),
+        FOREIGN KEY(planoTreinoId) REFERENCES planos_treino(id)
       );
     `);
 

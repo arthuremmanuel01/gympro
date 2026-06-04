@@ -66,8 +66,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Manter os métodos GET e PATCH inalterados abaixo...
-
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();

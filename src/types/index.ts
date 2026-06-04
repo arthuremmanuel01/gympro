@@ -83,6 +83,9 @@ export interface Aluno {
   observacoesMedicas?: string;
   solicitacaoProfessorId?: string | null;
   nomeProfessorSolicitante?: string | null;
+  streak?: number;
+  treinosMes?: number;
+  ultimoTreinoEm?: string;
 }
 
 export interface Equipamento {

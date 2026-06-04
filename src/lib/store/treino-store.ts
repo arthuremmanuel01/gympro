@@ -9,7 +9,7 @@ interface WorkoutStore {
 
   setActiveSession: (planId: string | null) => void;
   marcarSerie: (exerciseId: string, totalSets: number) => void;
-  reiniciarSessao: (planId: string) => void;
+  reiniciarSessao: (exercicios: Exercicio[]) => void;
   updatePlan: (plan: PlanoTreino) => void;
   addPlan: (plan: PlanoTreino) => void;
   deletePlan: (planId: string) => void;
@@ -31,11 +31,9 @@ export const useTreinoStore = create<WorkoutStore>((set, get) => ({
       return { progressoExercicio: { ...state.progressoExercicio, [exerciseId]: next } };
     }),
 
-  reiniciarSessao: (planId) => {
-    const plan = get().planos.find((p) => p.id === planId);
-    if (!plan) return;
+  reiniciarSessao: (exercicios) => {
     const reset: Record<string, number> = {};
-    plan.exercicios.forEach((ex: Exercicio) => {
+    exercicios.forEach((ex) => {
       reset[ex.id] = 0;
     });
     set({ progressoExercicio: reset });
