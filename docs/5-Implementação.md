@@ -29,7 +29,7 @@
 | Requisito/Tela                | Status | Última atualização | Próxima entrega |
 |--------------------------------|--------|--------------------|-----------------|
 | Tela Principal                 | 🟢 Concluída     | 28/05/2026         | -               |
-| Tela de Login                  | 🟢 Concluído | 28/05/2026         | -      |
+| Telas de Login                  | 🟢 Concluído | 28/05/2026         | -      |
 | Tela do Aluno   | 🟢 Concluído | 28/05/2026                  | -     |
 | Tela do Professor                 | 🟢 Concluída     | 28/05/2026        | -               |
 | Tela da Manuntenção                  | 🟢 Concluído | 28/05/2026         | -      |
@@ -47,13 +47,33 @@ Legenda: 🟢 Concluído | 🟡 Em andamento | 🔴 Não iniciado
 
 #### 5.3.1 Tela principal do sistema
 **Descrição:** Apresenta visão geral das funcionalidades e acessos principais.  
-[`Tela principal do sistema`](images/)
+
+<img src="images/preview/screen_01.png" alt="tela 1" width="400"/>
+
+[`Tela principal do sistema`](images/preview/screen_01.png)
+
+
 
 ---
 
 #### 5.3.2 Tela de login
 **Descrição:** Permite acesso de usuários registrados.  
-[`Tela de login`](images/)
+
+<img src="images/preview/screen_02.png" alt="tela 2" width="400"/>
+
+[`Tela de login do aluno`](images/preview/screen_02.png)
+
+<img src="images/preview/screen_03.png" alt="tela 3" width="400"/>
+
+
+[`Tela de login do professor`](images/preview/screen_03.png)
+
+<img src="images/preview/screen_04.png" alt="tela 4" width="400"/>
+
+
+[`Tela de login da gerência`](images/preview/screen_04.png)
+
+
 
 ---
 
