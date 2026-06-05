@@ -11,8 +11,8 @@
 
 | Categoria             | Tecnologia/Ferramenta | Justificativa de uso |
 |-----------------------|------------------------|----------------------|
-| Linguagem             | JavaScript             | Implementação das funcionalidades do front-end. |
-| Framework Front-end   | React.js               | Criação de interfaces dinâmicas e reutilizáveis. |
+| Linguagem             | TypeScript             | Implementação das funcionalidades do front-end. |
+| Framework Front-end   | Next.js               | Criação de interfaces dinâmicas e reutilizáveis. |
 | Banco de Dados        | MySQL                  | Armazenamento e gerenciamento de dados. |
 | Ferramenta de Design  | Figma                  | Criação de protótipos e wireframes. |
 | IDE                   | VS Code                | Ambiente principal de desenvolvimento. |
@@ -28,9 +28,16 @@
 
 | Requisito/Tela                | Status | Última atualização | Próxima entrega |
 |--------------------------------|--------|--------------------|-----------------|
-| Tela principal                 | 🟢 Concluída     | 10/08/2025         | -               |
-| Tela de login                  | 🟡 Em andamento | 09/08/2025         | 15/08/2025      |
-| Tela de cadastro de produto    | 🔴 Não iniciada | -                  | 20/08/2025      |
+| Tela Principal                 | 🟢 Concluída     | 28/05/2026         | -               |
+| Tela de Login                  | 🟢 Concluído | 28/05/2026         | -      |
+| Tela do Aluno   | 🟢 Concluído | 28/05/2026                  | -     |
+| Tela do Professor                 | 🟢 Concluída     | 28/05/2026        | -               |
+| Tela da Manuntenção                  | 🟢 Concluído | 28/05/2026         | -      |
+| Tela do Financeiro   | 🟢 Concluído | 28/05/2026               | -     |
+| Tela dos Equipamentos                 | 🟢 Concluída     | 28/05/2026         | -               |
+| Tela dos Alertas                  | 🟢 Concluído | 28/05/2026         | -      |
+| Tela da Dashboard    | 🟢 Concluído | 28/05/2026                  | -     |
+
 
 Legenda: 🟢 Concluído | 🟡 Em andamento | 🔴 Não iniciado
 
