@@ -1,6 +1,6 @@
 'use client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import type { Equipamento } from '@/types';
+import type { Equipamento, StatusEquipamento } from '@/types';
 
 export function useEquipamentos() {
   return useQuery({
@@ -47,7 +47,6 @@ export function useRemoveEquipment() {
 
 export function useUpdateEquipmentStatus() {
   const queryClient = useQueryClient();
-  const updateStatus = useEquipmentStore((s) => s.updateStatus);
   return useMutation({
     mutationFn: async ({
       id,
@@ -58,9 +57,13 @@ export function useUpdateEquipmentStatus() {
       status: StatusEquipamento;
       notes?: string;
     }) => {
-      await new Promise((r) => setTimeout(r, 400));
-      updateStatus(id, status, notes);
-      return { id, status };
+      const res = await fetch(`/api/equipamentos/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status, notes }),
+      });
+      if (!res.ok) throw new Error('Falha ao atualizar status do equipamento');
+      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['equipamentos'] });

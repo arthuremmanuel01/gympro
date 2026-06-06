@@ -43,7 +43,7 @@ export default function EquipamentosPage() {
   };
 
   function handleSave() {
-    if (!selected) return;
+    if (!selected || selected.status === 'quebrado') return;
     updateStatus(
       { id: selected.id, status: newStatus, notes: notes || undefined },
       {
@@ -111,7 +111,15 @@ export default function EquipamentosPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.04 }}
               >
-                <Card interactive onClick={() => { setSelected(eq); setNewStatus(eq.status); setNotes(eq.notes ?? ''); }}>
+                <Card
+                  interactive={eq.status !== 'quebrado'}
+                  onClick={() => {
+                    if (eq.status === 'quebrado') return;
+                    setSelected(eq);
+                    setNewStatus(eq.status);
+                    setNotes(eq.notes ?? '');
+                  }}
+                >
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
