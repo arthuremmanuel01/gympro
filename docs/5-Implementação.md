@@ -61,17 +61,17 @@ Legenda: 🟢 Concluído | 🟡 Em andamento | 🔴 Não iniciado
 
 <img src="images/preview/screen_02.png" alt="tela 2" width="650"/>
 
-[`Tela de login do aluno`](images/preview/screen_02.png)
+[`Tela de Login do Aluno`](images/preview/screen_02.png)
 
 <img src="images/preview/screen_03.png" alt="tela 3" width="650"/>
 
 
-[`Tela de login do professor`](images/preview/screen_03.png)
+[`Tela de Login do Professor`](images/preview/screen_03.png)
 
 <img src="images/preview/screen_04.png" alt="tela 4" width="650"/>
 
 
-[`Tela de login da gerência`](images/preview/screen_04.png)
+[`Tela de Login da Gerência`](images/preview/screen_04.png)
 
 
 
@@ -83,17 +83,17 @@ Legenda: 🟢 Concluído | 🟡 Em andamento | 🔴 Não iniciado
 #### 5.3.3.1 Início (Aluno)
 <img src="images/preview/screen_05.png" alt="tela 5" width="650"/>
 
-[`Tela de início do aluno`](images/preview/screen_05.png)
+[`Tela de Início do Aluno`](images/preview/screen_05.png)
 
 #### 5.3.3.2 Ficha de Treino (Aluno)
 <img src="images/preview/screen_06.png" alt="tela 6" width="650"/>
 
-[`Tela de fichas de treino do aluno`](images/preview/screen_06.png)
+[`Tela de fichas de treino do Aluno`](images/preview/screen_06.png)
 
 #### 5.3.3.3 Caixa de Alertas (Aluno)
 <img src="images/preview/screen_07.png" alt="tela 7" width="650"/>
 
-[`Tela de caixas de alerta do aluno`](images/preview/screen_07.png)
+[`Tela de Caixa de Alertas do Aluno`](images/preview/screen_07.png)
 
 ---
 
@@ -103,32 +103,32 @@ Legenda: 🟢 Concluído | 🟡 Em andamento | 🔴 Não iniciado
 #### 5.3.4.1 Início (Professor)
 <img src="images/preview/screen_08.png" alt="tela 8" width="650"/>
 
-[`Tela de início do professor`](images/preview/screen_08.png)
+[`Tela de Início do Professor`](images/preview/screen_08.png)
 
 #### 5.3.4.2 Lista de Alunos
 <img src="images/preview/screen_09.png" alt="tela 9" width="650"/>
 
-[`Tela da listagem de alunos do professor`](images/preview/screen_09.png)
+[`Tela da Listagem de Alunos do Professor`](images/preview/screen_09.png)
 
 #### 5.3.4.3 Lista de Equipamentos
 <img src="images/preview/screen_10.png" alt="tela 10" width="650"/>
 
-[`Tela da listagem dos equipamentos`](images/preview/screen_10.png)
+[`Tela da Listagem dos Equipamentos`](images/preview/screen_10.png)
 
 #### 5.3.4.4 Lista de Equipamentos - Editar Equipamento
 <img src="images/preview/screen_11.png" alt="tela 11" width="650"/>
 
-[`Tela da listagem dos equipamentos (editar)`](images/preview/screen_11.png)
+[`Tela da Listagem dos Equipamentos (editar)`](images/preview/screen_11.png)
 
 #### 5.3.4.5 Caixa de Alertas (Professor)
 <img src="images/preview/screen_12.png" alt="tela 12" width="650"/>
 
-[`Tela de caixas de alerta do professor`](images/preview/screen_12.png)
+[`Tela de Caixa de Alertas do Professor`](images/preview/screen_12.png)
 
 #### 5.3.4.6 Caixa de Alertas (Professor) - Criar Alerta
 <img src="images/preview/screen_13.png" alt="tela 13" width="650"/>
 
-[`Tela de caixas de alerta do professor (criar)`](images/preview/screen_13.png)
+[`Tela de Caixa de Alertas do Professor (criar)`](images/preview/screen_13.png)
 
 ---
 
@@ -138,14 +138,14 @@ Legenda: 🟢 Concluído | 🟡 Em andamento | 🔴 Não iniciado
 #### 5.3.4.1 Dashboard
 <img src="images/preview/screen_14.png" alt="tela 14" width="650"/>
 
-[`Tela da dashboard`](images/preview/screen_14.png)
+[`Tela da Dashboard`](images/preview/screen_14.png)
 
 #### 5.3.4.2 Financeiro
 <img src="images/preview/screen_15.png" alt="tela 15" width="650"/>
 
-[`Tela da parte financeirar`](images/preview/screen_15.png)
+[`Tela da parte Financeira`](images/preview/screen_15.png)
 
 #### 5.3.4.3 Manuntenção
 <img src="images/preview/screen_16.png" alt="tela 16" width="650"/>
 
-[`Tela da listagem de manuntenção`](images/preview/screen_16.png)
+[`Tela da Listagem de Manuntenção`](images/preview/screen_16.png)
