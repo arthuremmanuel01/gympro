@@ -13,7 +13,7 @@
 |-----------------------|------------------------|----------------------|
 | Linguagem             | TypeScript             | Implementação das funcionalidades do front-end. |
 | Framework Front-end   | Next.js               | Criação de interfaces dinâmicas e reutilizáveis. |
-| Banco de Dados        | MySQL                  | Armazenamento e gerenciamento de dados. |
+| Banco de Dados        | SQLite                  | Armazenamento e gerenciamento de dados. |
 | Ferramenta de Design  | Figma                  | Criação de protótipos e wireframes. |
 | IDE                   | VS Code                | Ambiente principal de desenvolvimento. |
 
