@@ -8,4 +8,6 @@ TYPESCRIPT. TypeScript Documentation. Disponível em: <https://www.typescriptlan
 
 ORACLE. SQL Language Reference. Disponível em: <https://docs.oracle.com/en/database/oracle/oracle-database/>. Acesso em: 06 jun. 2026.
 
+SQLITE. SQLite Documentation. Disponível em: <https://www.sqlite.org/docs.html>. Acesso em: 06 jun. 2026.
+
 FIGMA. Figma: Interface Design Tool. Disponível em: <https://www.figma.com>. Acesso em: 06 Junho 2026.
