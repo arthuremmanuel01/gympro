@@ -1,14 +1,9 @@
 import { createClient, type Client } from '@libsql/client';
 
-// Cliente único inicializado de forma segura para o ecossistema do Next.js
 export const db: Client = createClient({
   url: 'file:gympro.db',
 });
 
-/**
- * Executa as migrações estruturais do banco de dados de forma assíncrona e segura.
- * Responsabilidade Única: Garantir a integridade do Schema DDL e disparar a semente de dados.
- */
 export async function inicializarSchema(): Promise<void> {
   try {
     await db.execute(`
@@ -90,7 +85,6 @@ export async function inicializarSchema(): Promise<void> {
   }
 }
 
-// Gatilho de inicialização assíncrona automática executado na carga do módulo
 inicializarSchema().catch((error) => {
   console.error('Falha crítica na inicialização automática do banco de dados:', error);
 });
