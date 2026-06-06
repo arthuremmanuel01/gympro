@@ -43,7 +43,7 @@ export default function EquipamentosPage() {
   };
 
   function handleSave() {
-    if (!selected || selected.status === 'quebrado') return;
+    if (!selected || selected.status === 'quebrado' || newStatus === 'manutencao') return;
     updateStatus(
       { id: selected.id, status: newStatus, notes: notes || undefined },
       {
@@ -179,7 +179,6 @@ export default function EquipamentosPage() {
             onChange={(e) => setNewStatus(e.target.value as StatusEquipamento)}
             options={[
               { value: 'funcionando', label: '✅ Funcionando' },
-              { value: 'manutencao', label: '⚠️ Em Manutenção' },
               { value: 'quebrado', label: '❌ Quebrado' },
             ]}
           />

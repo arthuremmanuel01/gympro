@@ -23,13 +23,10 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     const { status, notes } = body;
 
     if (status === 'manutencao') {
-      await db.execute({
-        sql: `UPDATE equipamentos 
-              SET status = ?, notes = ?, ultimaManutencaoEm = ? 
-              WHERE id = ?`,
-        args: [status, notes || null, new Date().toISOString(), id]
-      });
-    } else if (status === 'quebrado') {
+      return NextResponse.json({ error: 'Operação não permitida. O status em manutenção só pode ser definido via aprovação do gestor.' }, { status: 403 });
+    }
+
+    if (status === 'quebrado') {
       await db.execute({
         sql: `UPDATE equipamentos 
               SET status = ?, notes = ? 
