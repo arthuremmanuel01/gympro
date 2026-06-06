@@ -35,4 +35,5 @@
 
 ## Vídeo
 
-No caso de apresentação gravada, insira aqui o link do vídeo de apresentação.
+[`LINK de DOWNLOAD do VÍDEO`](video/Vídeo_de_Apresentação_do_GymPro-GRUPO_2_(Ana_Clara,_Arthur_Emmanuel,_Enrico_Guilherme_e_Luiz_Felipe).mp4)
+
