@@ -32,6 +32,7 @@
 <img src="slides/slide_13.png" alt="slide 13" width="800"/>
 <img src="slides/slide_14.png" alt="slide 14" width="800"/>
 <img src="slides/slide_15.png" alt="slide 15" width="800"/>
+<img src="slides/slide_16.png" alt="slide 16" width="800"/>
 
 ## Vídeo
 
