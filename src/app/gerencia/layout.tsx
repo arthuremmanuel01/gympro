@@ -3,12 +3,13 @@ import { useAuthGuard } from '@/hooks/use-auth-guard';
 import { Sidebar } from '@/components/shared/sidebar';
 import { MobileHeader } from '@/components/shared/mobile-header';
 import { BottomNav } from '@/components/shared/bottom-nav';
-import { LayoutDashboard, DollarSign, Wrench } from 'lucide-react';
+import { LayoutDashboard, DollarSign, Wrench, Dumbbell } from 'lucide-react';
 
 const navItems = [
   { href: '/gerencia/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/gerencia/financeiro', label: 'Financeiro', icon: DollarSign },
   { href: '/gerencia/manutencao', label: 'Manutenção', icon: Wrench },
+  { href: '/gerencia/equipamentos', label: 'Equipamentos', icon: Dumbbell}
 ];
 
 export default function GerenciaLayout({ children }: { children: React.ReactNode }) {

@@ -1,17 +1,47 @@
 'use client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useEquipmentStore } from '@/lib/store/equipamentos-store';
-import type { Equipamento, StatusEquipamento } from '@/types';
+import type { Equipamento } from '@/types';
 
 export function useEquipamentos() {
-  const equipamentos = useEquipmentStore((s) => s.equipamentos);
   return useQuery({
-    queryKey: ['equipamentos', equipamentos.length, equipamentos.map((e) => e.status).join(',')],
-    queryFn: async () => {
-      await new Promise((r) => setTimeout(r, 300));
-      return equipamentos;
+    queryKey: ['equipamentos'],
+    queryFn: async (): Promise<Equipamento[]> => {
+      const res = await fetch('/api/equipamentos');
+      if (!res.ok) throw new Error('Falha ao buscar equipamentos');
+      return res.json();
     },
-    staleTime: Infinity,
+  });
+}
+
+export function useAddEquipment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (equipamento: Partial<Equipamento>) => {
+      const res = await fetch('/api/equipamentos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(equipamento),
+      });
+      if (!res.ok) throw new Error('Falha ao adicionar equipamento');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['equipamentos'] });
+    },
+  });
+}
+
+export function useRemoveEquipment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/equipamentos/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Falha ao remover equipamento');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['equipamentos'] });
+    },
   });
 }
 
@@ -31,21 +61,6 @@ export function useUpdateEquipmentStatus() {
       await new Promise((r) => setTimeout(r, 400));
       updateStatus(id, status, notes);
       return { id, status };
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['equipamentos'] });
-    },
-  });
-}
-
-export function useAddEquipment() {
-  const queryClient = useQueryClient();
-  const addEquipment = useEquipmentStore((s) => s.addEquipment);
-  return useMutation({
-    mutationFn: async (equipamentos: Equipamento) => {
-      await new Promise((r) => setTimeout(r, 500));
-      addEquipment(equipamentos);
-      return equipamentos;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['equipamentos'] });
