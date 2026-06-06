@@ -46,9 +46,9 @@ Legenda: 🟢 Concluído | 🟡 Em andamento | 🔴 Não iniciado
 ### 5.3 Registro Visual das Telas
 
 #### 5.3.1 Tela principal do sistema
-**Descrição:** Apresenta visão geral das funcionalidades e acessos principais.  
+**Descrição:** Introdução ao site junto com as opções de Login.  
 
-<img src="images/preview/screen_01.png" alt="tela 1" width="400"/>
+<img src="images/preview/screen_01.png" alt="tela 1" width="800"/>
 
 [`Tela principal do sistema`](images/preview/screen_01.png)
 
@@ -56,19 +56,19 @@ Legenda: 🟢 Concluído | 🟡 Em andamento | 🔴 Não iniciado
 
 ---
 
-#### 5.3.2 Tela de login
-**Descrição:** Permite acesso de usuários registrados.  
+#### 5.3.2 Telas de login
+**Descrição:** Permite acesso de usuários registrados conforme o tipo de conta.  
 
-<img src="images/preview/screen_02.png" alt="tela 2" width="400"/>
+<img src="images/preview/screen_02.png" alt="tela 2" width="650"/>
 
 [`Tela de login do aluno`](images/preview/screen_02.png)
 
-<img src="images/preview/screen_03.png" alt="tela 3" width="400"/>
+<img src="images/preview/screen_03.png" alt="tela 3" width="650"/>
 
 
 [`Tela de login do professor`](images/preview/screen_03.png)
 
-<img src="images/preview/screen_04.png" alt="tela 4" width="400"/>
+<img src="images/preview/screen_04.png" alt="tela 4" width="650"/>
 
 
 [`Tela de login da gerência`](images/preview/screen_04.png)
@@ -77,31 +77,75 @@ Legenda: 🟢 Concluído | 🟡 Em andamento | 🔴 Não iniciado
 
 ---
 
-#### 5.3.3 Tela de cadastro de produto
-**Descrição:** Formulário para inserir novos produtos no estoque.  
-[`Tela de cadastro`](images/)
+#### 5.3.3 Telas do Aluno
+**Descrição:** Permite os alunos visualizarem suas fichas de treino e seus alertas.  
 
+#### 5.3.3.1 Início (Aluno)
+<img src="images/preview/screen_05.png" alt="tela 5" width="650"/>
+
+[`Tela de início do aluno`](images/preview/screen_05.png)
+
+#### 5.3.3.2 Ficha de Treino (Aluno)
+<img src="images/preview/screen_06.png" alt="tela 6" width="650"/>
+
+[`Tela de fichas de treino do aluno`](images/preview/screen_06.png)
+
+#### 5.3.3.3 Caixa de Alertas (Aluno)
+<img src="images/preview/screen_07.png" alt="tela 7" width="650"/>
+
+[`Tela de caixas de alerta do aluno`](images/preview/screen_07.png)
 
 ---
-> **📢 AVISO IMPORTANTE – ATUALIZAÇÃO DE PROGRESSO**  
-> *(leia com atenção antes de finalizar a sprint)*  
->
-> 1. **Ao final de cada sprint**, atualizar o quadro de progresso com:  
->    - Status da tela (🟢, 🟡 ou 🔴)  
->    - Data da última modificação  
->    - Próxima previsão de entrega  
-> 2. Adicionar **imagens reais** das telas desenvolvidas no diretório `images/`.  
-> 3. Descrever brevemente as funcionalidades implementadas ou mudanças feitas desde a última atualização.  
->
-> **OBJETIVO**: Permitir que o professor visualize rapidamente **o que já foi entregue, o que está em andamento e o que ainda falta desenvolver**, garantindo acompanhamento eficaz do projeto.
 
+#### 5.3.4 Telas do Professor
+**Descrição:** Permite o professor visualizar seus alunos, editar suas fichas, ver os equipamentos da academia e ver ou criar alertas.
 
+#### 5.3.4.1 Início (Professor)
+<img src="images/preview/screen_08.png" alt="tela 8" width="650"/>
 
+[`Tela de início do professor`](images/preview/screen_08.png)
 
+#### 5.3.4.2 Lista de Alunos
+<img src="images/preview/screen_09.png" alt="tela 9" width="650"/>
 
+[`Tela da listagem de alunos do professor`](images/preview/screen_09.png)
 
+#### 5.3.4.3 Lista de Equipamentos
+<img src="images/preview/screen_10.png" alt="tela 10" width="650"/>
 
+[`Tela da listagem dos equipamentos`](images/preview/screen_10.png)
 
+#### 5.3.4.4 Lista de Equipamentos - Editar Equipamento
+<img src="images/preview/screen_11.png" alt="tela 11" width="650"/>
 
+[`Tela da listagem dos equipamentos (editar)`](images/preview/screen_11.png)
 
+#### 5.3.4.5 Caixa de Alertas (Professor)
+<img src="images/preview/screen_12.png" alt="tela 12" width="650"/>
 
+[`Tela de caixas de alerta do professor`](images/preview/screen_12.png)
+
+#### 5.3.4.6 Caixa de Alertas (Professor) - Criar Alerta
+<img src="images/preview/screen_13.png" alt="tela 13" width="650"/>
+
+[`Tela de caixas de alerta do professor (criar)`](images/preview/screen_13.png)
+
+---
+
+#### 5.3.4 Telas da Gerência
+**Descrição:** Permite a Gerências ver a dashboard, a área financeira e os equipamentos da academia que necessitam de manuntenção.
+
+#### 5.3.4.1 Dashboard
+<img src="images/preview/screen_14.png" alt="tela 14" width="650"/>
+
+[`Tela da dashboard`](images/preview/screen_14.png)
+
+#### 5.3.4.2 Financeiro
+<img src="images/preview/screen_15.png" alt="tela 15" width="650"/>
+
+[`Tela da parte financeirar`](images/preview/screen_15.png)
+
+#### 5.3.4.3 Manuntenção
+<img src="images/preview/screen_16.png" alt="tela 16" width="650"/>
+
+[`Tela da listagem de manuntenção`](images/preview/screen_16.png)
