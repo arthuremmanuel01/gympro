@@ -17,7 +17,21 @@
 
 ## Slides
 
-Coloque aqui os slides da apresentação
+<img src="slides/slide_01.png" alt="slide 1" width="800"/>
+<img src="slides/slide_02.png" alt="slide 2" width="800"/>
+<img src="slides/slide_03.png" alt="slide 3" width="800"/>
+<img src="slides/slide_04.png" alt="slide 4" width="800"/>
+<img src="slides/slide_05.png" alt="slide 5" width="800"/>
+<img src="slides/slide_06.png" alt="slide 6" width="800"/>
+<img src="slides/slide_07.png" alt="slide 7" width="800"/>
+<img src="slides/slide_08.png" alt="slide 8" width="800"/>
+<img src="slides/slide_09.png" alt="slide 9" width="800"/>
+<img src="slides/slide_10.png" alt="slide 10" width="800"/>
+<img src="slides/slide_11.png" alt="slide 11" width="800"/>
+<img src="slides/slide_12.png" alt="slide 12" width="800"/>
+<img src="slides/slide_13.png" alt="slide 13" width="800"/>
+<img src="slides/slide_14.png" alt="slide 14" width="800"/>
+<img src="slides/slide_15.png" alt="slide 15" width="800"/>
 
 ## Vídeo
 
