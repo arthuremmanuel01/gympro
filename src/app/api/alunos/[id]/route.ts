@@ -3,10 +3,10 @@ import { db } from '@/lib/db';
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const alunoId = params.id;
+    const { id: alunoId } = await params;
     if (!alunoId) {
       return NextResponse.json({ error: 'ID do aluno não fornecido' }, { status: 400 });
     }
