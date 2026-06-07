@@ -430,6 +430,8 @@ export default function StudentDetailPage({ params }: PageProps) {
 
   const [fichaModal, setFichaModal] = useState(false);
   const [modoEditar, setModoEditar] = useState(false);
+  const [excluirModal, setExcluirModal] = useState(false);
+  const [excluindo, setExcluindo] = useState(false);
 
   const isPending = criando || atualizando;
 
@@ -706,7 +708,7 @@ export default function StudentDetailPage({ params }: PageProps) {
 
 
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-        <Card style={{ borderColor: 'rgba(239, 68, 68, 0.3)' }}>
+        <Card className="border-red-500/30">
           <CardContent className="p-4">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div>

@@ -248,7 +248,7 @@ export default function AlunoDashboardPage() {
 
 
       <motion.div variants={item} className="pt-6">
-        <Card style={{ borderColor: 'rgba(239, 68, 68, 0.3)' }}>
+        <Card className="border-red-500/30">
           <CardContent className="p-4">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div>
