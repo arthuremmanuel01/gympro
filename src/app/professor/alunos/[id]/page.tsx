@@ -24,9 +24,10 @@ import {
 import {
   Phone, Mail, Calendar, CreditCard, Dumbbell, Plus, Trash2, ArrowLeft,
   ChevronDown, ChevronUp, GripVertical, Save, RefreshCw, Clock, Target,
-  Layers, CheckCircle2,
+  Layers, CheckCircle2, AlertCircle,
 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import type { DificuldadeTreino } from '@/types';
 
 interface PageProps {
@@ -419,6 +420,7 @@ function DivisaoCard({
 
 export default function StudentDetailPage({ params }: PageProps) {
   const { id } = use(params);
+  const router = useRouter();
   const { user } = useAutenticacaoStore();
   const queryClient = useQueryClient();
   const { data: student, isLoading: loadingStudent } = useStudent(id);
@@ -529,6 +531,23 @@ export default function StudentDetailPage({ params }: PageProps) {
           queryClient.invalidateQueries({ queryKey: ['plano-treino-completo', res.id] });
         },
       });
+    }
+  }
+
+  async function handleExcluirAluno() {
+    if (!student) return;
+    setExcluindo(true);
+    try {
+      const res = await fetch(`/api/alunos/${student.id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error();
+      toast.success('Aluno excluído com sucesso.');
+      setExcluirModal(false);
+      queryClient.invalidateQueries({ queryKey: ['alunos'] });
+      router.push('/professor/alunos');
+    } catch {
+      toast.error('Erro ao excluir aluno. Tente novamente mais tarde.');
+    } finally {
+      setExcluindo(false);
     }
   }
 
@@ -684,6 +703,57 @@ export default function StudentDetailPage({ params }: PageProps) {
           </Card>
         )}
       </motion.div>
+
+
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+        <Card style={{ borderColor: 'rgba(239, 68, 68, 0.3)' }}>
+          <CardContent className="p-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div>
+                <h3 className="text-sm font-bold text-red-400 flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4" /> Zona de Risco (Excluir Aluno)
+                </h3>
+                <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>
+                  A exclusão do aluno é irreversível e apagará permanentemente todos os dados vinculados a ele (fichas, treinos e conta).
+                </p>
+              </div>
+              <Button
+                type="button"
+                className="w-full sm:w-auto text-red-400 hover:text-white"
+                style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)' }}
+                onClick={() => setExcluirModal(true)}
+              >
+                Excluir Aluno
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+
+      <Modal isOpen={excluirModal} onClose={() => setExcluirModal(false)} title="Excluir Aluno Permanentemente">
+        <div className="space-y-4">
+          <p className="text-sm text-red-400 font-semibold">
+            Tem certeza que deseja excluir o aluno {student?.name}?
+          </p>
+          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+            Esta ação não pode ser desfeita. Todo o histórico de treinos, fichas, e a conta do aluno serão apagados.
+          </p>
+          <div className="flex gap-3 pt-2">
+            <Button variant="outline" className="flex-1" onClick={() => setExcluirModal(false)} disabled={excluindo}>
+              Cancelar
+            </Button>
+            <Button
+              className="flex-1 bg-red-500 hover:bg-red-600 text-white"
+              onClick={handleExcluirAluno}
+              carregando={excluindo}
+              leftIcon={<Trash2 className="h-4 w-4" />}
+            >
+              Sim, Excluir Aluno
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
 
       <Modal

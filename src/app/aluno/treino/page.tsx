@@ -167,10 +167,10 @@ export default function TreinoPage() {
   const temSolicitacaoPendente = !!student?.solicitacaoFichaEm;
 
 
-  const exConcluidosNaDiv = divisaoAtual?.exercicios.filter(
+  const exConcluidosNaDiv = divisaoAtual?.exercicios?.filter(
     (ex) => (progresso[ex.id] ?? 0) >= ex.series
   ).length ?? 0;
-  const totalExNaDiv = divisaoAtual?.exercicios.length ?? 0;
+  const totalExNaDiv = divisaoAtual?.exercicios?.length ?? 0;
   const divisaoConcluida = totalExNaDiv > 0 && exConcluidosNaDiv >= totalExNaDiv;
 
   function marcarSerie(exId: string, totalSeries: number) {
@@ -187,7 +187,7 @@ export default function TreinoPage() {
   }
 
   function reiniciarDivisao() {
-    if (!divisaoAtual) return;
+    if (!divisaoAtual || !divisaoAtual.exercicios) return;
     const reset: Record<string, number> = {};
     divisaoAtual.exercicios.forEach((ex) => { reset[ex.id] = 0; });
     setProgresso((prev) => ({ ...prev, ...reset }));
@@ -296,6 +296,18 @@ export default function TreinoPage() {
               Solicitar Ficha de Treino
             </Button>
           )}
+        </div>
+      ) : !plano.divisoes ? (
+        <div className="flex flex-col items-center justify-center py-16 text-center space-y-5">
+          <div className="h-16 w-16 rounded-2xl flex items-center justify-center" style={{ background: 'var(--color-bg-elevated)' }}>
+            <RefreshCw className="h-8 w-8 animate-spin" style={{ color: 'var(--color-primary)' }} />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold mb-1" style={{ color: 'var(--color-text-primary)' }}>Atualizando Formato</h2>
+            <p className="text-sm px-4" style={{ color: 'var(--color-text-muted)' }}>
+              Sua ficha está no formato antigo ou incompleta. Peça ao professor para atualizá-la usando o novo modelo de divisões.
+            </p>
+          </div>
         </div>
       ) : (
         <>

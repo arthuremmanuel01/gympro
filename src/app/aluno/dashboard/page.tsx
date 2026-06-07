@@ -2,7 +2,7 @@
 import { motion } from 'framer-motion';
 import { useAutenticacaoStore } from '@/lib/store/auth-store';
 import { useAlunoPorUsuarioId } from '@/lib/queries/use-alunos';
-import { usePlanoTreino } from '@/lib/queries/use-treinos';
+import { usePlanoTreinoCompleto } from '@/lib/queries/use-plano-completo';
 import { useAlertsForRole } from '@/lib/queries/use-alertas';
 import { SkeletonCard } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
@@ -15,15 +15,25 @@ import {
   Flame,
   ChevronRight,
   Bell,
+  Trash2,
 } from 'lucide-react';
 import { formatCurrency, getPaymentStatusBg, getPaymentStatusLabel } from '@/lib/utils';
 import Link from 'next/link';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import { Modal } from '@/components/ui/modal';
+import { Button } from '@/components/ui/button';
 
 
 export default function AlunoDashboardPage() {
-  const { user } = useAutenticacaoStore();
+  const { user, logout } = useAutenticacaoStore();
+  const router = useRouter();
+  const [excluirModal, setExcluirModal] = useState(false);
+  const [excluindo, setExcluindo] = useState(false);
+
   const { data: student, isLoading: loadingStudent } = useAlunoPorUsuarioId(user?.id ?? '');
-  const { data: workoutPlan, isLoading: loadingPlan } = usePlanoTreino(
+  const { data: workoutPlan, isLoading: loadingPlan } = usePlanoTreinoCompleto(
     student?.planoTreinoAtivoId
   );
   const { data: alertas, isLoading: loadingAlerts } = useAlertsForRole('aluno');
@@ -39,9 +49,26 @@ export default function AlunoDashboardPage() {
     show: { opacity: 1, y: 0 },
   };
 
+  async function handleExcluirConta() {
+    if (!student) return;
+    setExcluindo(true);
+    try {
+      const res = await fetch(`/api/alunos/${student.id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error();
+      toast.success('Conta excluída com sucesso.');
+      setExcluirModal(false);
+      logout();
+      router.push('/auth/login');
+    } catch {
+      toast.error('Erro ao excluir conta. Tente novamente mais tarde.');
+    } finally {
+      setExcluindo(false);
+    }
+  }
+
   return (
     <motion.div variants={container} initial="hidden" animate="show" className="space-y-4">
-      {/* Greeting */}
+
       <motion.div variants={item} className="flex items-center gap-3 py-2">
         {user && <Avatar name={user.name} size="md" />}
         <div>
@@ -54,7 +81,7 @@ export default function AlunoDashboardPage() {
         </div>
       </motion.div>
 
-      {/* Status pagamento */}
+
       {loadingStudent ? (
         <SkeletonCard />
       ) : student ? (
@@ -111,7 +138,7 @@ export default function AlunoDashboardPage() {
         </motion.div>
       ) : null}
 
-      {/* Ficha Ativa */}
+
       <motion.div variants={item}>
         <Link href="/aluno/treino">
           <div
@@ -137,7 +164,7 @@ export default function AlunoDashboardPage() {
                   </div>
                   <h2 className="text-lg font-bold text-white">{workoutPlan.name}</h2>
                   <p className="text-sm text-white/70 mt-0.5">
-                    {workoutPlan.exercicios.length} exercícios • {workoutPlan.diasPorSemana}x/semana
+                    {workoutPlan.divisoes?.reduce((a, d) => a + (d.exercicios?.length || 0), 0) ?? 0} exercícios • {workoutPlan.diasPorSemana}x/semana
                   </p>
                 </div>
                 <ChevronRight className="h-5 w-5 text-white/70" />
@@ -152,7 +179,7 @@ export default function AlunoDashboardPage() {
         </Link>
       </motion.div>
 
-      {/* Estatísticas */}
+
       <motion.div variants={item} className="grid grid-cols-2 gap-3">
         <Card>
           <CardContent className="p-4">
@@ -191,7 +218,7 @@ export default function AlunoDashboardPage() {
         </Card>
       </motion.div>
 
-      {/* Alertas recentes */}
+
       {!loadingAlerts && unreadAlerts > 0 && (
         <motion.div variants={item}>
           <Link href="/aluno/alertas">
@@ -218,6 +245,60 @@ export default function AlunoDashboardPage() {
           </Link>
         </motion.div>
       )}
+
+
+      <motion.div variants={item} className="pt-6">
+        <Card style={{ borderColor: 'rgba(239, 68, 68, 0.3)' }}>
+          <CardContent className="p-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div>
+                <h3 className="text-sm font-bold text-red-400 flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4" /> Danger Zone
+                </h3>
+                <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>
+                  A exclusão da conta é irreversível e apagará permanentemente todos os seus dados.
+                </p>
+              </div>
+              <Button
+                type="button"
+                className="w-full sm:w-auto text-red-400 hover:text-white"
+                style={{
+                  background: 'rgba(239, 68, 68, 0.1)',
+                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                }}
+                onClick={() => setExcluirModal(true)}
+              >
+                Excluir Minha Conta
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+
+      <Modal isOpen={excluirModal} onClose={() => setExcluirModal(false)} title="Excluir Conta Permanentemente">
+        <div className="space-y-4">
+          <p className="text-sm text-red-400 font-semibold">
+            Tem certeza que deseja excluir sua conta?
+          </p>
+          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+            Esta ação não pode ser desfeita. Todo o seu histórico de treinos, fichas, e informações serão perdidos.
+          </p>
+          <div className="flex gap-3 pt-2">
+            <Button variant="outline" className="flex-1" onClick={() => setExcluirModal(false)} disabled={excluindo}>
+              Cancelar
+            </Button>
+            <Button
+              className="flex-1 bg-red-500 hover:bg-red-600 text-white"
+              onClick={handleExcluirConta}
+              carregando={excluindo}
+              leftIcon={<Trash2 className="h-4 w-4" />}
+            >
+              Sim, Excluir Conta
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </motion.div>
   );
 }
