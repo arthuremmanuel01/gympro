@@ -15,7 +15,6 @@ const roles: Array<{
   icon: ElementType;
   gradient: string;
   glow: string;
-  badge: string;
 }> = [
   {
     role: 'aluno',
@@ -24,7 +23,6 @@ const roles: Array<{
     icon: Dumbbell,
     gradient: 'from-violet-600 via-purple-700 to-purple-900',
     glow: 'rgba(125, 20, 255, 0.5)',
-    badge: 'Mobile-First',
   },
   {
     role: 'professor',
@@ -33,7 +31,6 @@ const roles: Array<{
     icon: GraduationCap,
     gradient: 'from-blue-600 via-indigo-700 to-indigo-900',
     glow: 'rgba(99, 102, 241, 0.5)',
-    badge: 'Tablet & Mobile',
   },
   {
     role: 'gerencia',
@@ -42,7 +39,6 @@ const roles: Array<{
     icon: BarChart3,
     gradient: 'from-amber-500 via-orange-600 to-orange-900',
     glow: 'rgba(255, 179, 0, 0.5)',
-    badge: 'Desktop & Tablet',
   },
 ];
 
@@ -142,7 +138,7 @@ export default function RolePickerPage() {
         animate="show"
         className="w-full max-w-3xl grid grid-cols-1 sm:grid-cols-3 gap-4 z-10"
       >
-        {roles.map(({ role, label, description, icon: Icon, gradient, glow, badge }) => (
+        {roles.map(({ role, label, description, icon: Icon, gradient, glow }) => (
           <motion.button
             key={role}
             id={`role-btn-${role}`}
@@ -176,18 +172,6 @@ export default function RolePickerPage() {
             >
               <Icon className="h-6 w-6 text-white" />
             </div>
-
-            {/* Badge */}
-            <span
-              className="absolute top-4 right-4 text-[10px] font-bold px-2 py-0.5 rounded-full"
-              style={{
-                background: 'var(--color-bg-elevated)',
-                color: 'var(--color-text-muted)',
-                border: '1px solid var(--color-border-subtle)',
-              }}
-            >
-              {badge}
-            </span>
 
             <div>
               <h2

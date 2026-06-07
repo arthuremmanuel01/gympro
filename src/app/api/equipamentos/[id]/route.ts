@@ -5,13 +5,15 @@ import { randomUUID } from 'crypto';
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    
+
+    // Soft Delete: evita violação de FK com solicitacoes_manutencao
     await db.execute({
-      sql: 'DELETE FROM equipamentos WHERE id = ?',
-      args: [id]
+      sql: 'UPDATE equipamentos SET deletedAt = ? WHERE id = ?',
+      args: [new Date().toISOString(), id]
     });
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error('Erro ao remover equipamento:', error);
     return NextResponse.json({ error: 'Erro ao remover equipamento' }, { status: 500 });
   }
 }
@@ -20,7 +22,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   try {
     const { id } = await params;
     const body = await req.json();
-    const { status, notes } = body;
+    const { status, notes, urgencyLevel } = body;
 
     if (status === 'manutencao') {
       return NextResponse.json({ error: 'Operação não permitida. O status em manutenção só pode ser definido via aprovação do gestor.' }, { status: 403 });
@@ -40,13 +42,21 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       });
       const nomeEquipamento = equipmentResult.rows[0]?.name?.toString() || 'Equipamento';
 
+      // Mapeia o nível de urgência para o campo priority legado
+      const priorityMap: Record<string, string> = {
+        baixa: 'baixa',
+        media: 'media',
+        alta: 'alta',
+      };
+      const priority = urgencyLevel ? (priorityMap[urgencyLevel] ?? 'alta') : 'alta';
+
       const manutencaoId = randomUUID();
       await db.execute({
         sql: `INSERT INTO solicitacoes_manutencao (
                 id, equipamentoId, nomeEquipamento, solicitadoPorId, nomeSolicitante, 
-                description, priority, status, custoEstimadoBRL, aprovadoPorId, 
+                description, priority, urgencyLevel, status, custoEstimadoBRL, aprovadoPorId, 
                 criadoEm, resolvidoEm, notes
-              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         args: [
           manutencaoId,
           id,
@@ -54,7 +64,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
           'sistema-professor',
           'Interface do Professor',
           notes || 'Equipamento reportado como quebrado pelo professor.',
-          'alta',
+          priority,
+          urgencyLevel || 'alta',
           'pendente',
           null,
           null,
@@ -74,6 +85,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error('Erro ao atualizar equipamento:', error);
     return NextResponse.json({ error: 'Erro ao atualizar status do equipamento' }, { status: 500 });
   }
 }

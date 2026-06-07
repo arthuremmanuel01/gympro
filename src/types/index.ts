@@ -49,10 +49,52 @@ export interface PlanoTreino {
   professorId: string;
   dificuldade: DificuldadeTreino;
   diasPorSemana: number;
+  objetivo?: string;
   exercicios: Exercicio[];
   criadoEm: string;
   atualizadoEm: string;
   ativo: boolean;
+}
+
+// ── Hierarquia avanciada de fichas ───────────────────────────────────────────
+
+export interface ExercicioDivisao {
+  id: string;
+  divisaoId: string;
+  nome: string;
+  grupoMuscular: string;
+  equipamentoId?: string | null;
+  series: number;
+  repeticoes: string; // ex: '10-12' ou '15'
+  pesoKg?: number | null;
+  segundosDescanso: number;
+  observacoes?: string | null;
+  ordem: number;
+  // estado local de sessão (não persistido)
+  seriesConcluidas?: number;
+}
+
+export interface DivisaoTreino {
+  id: string;
+  planoId: string;
+  nome: string; // ex: 'Treino A - Peito e Tríceps' ou 'Segunda-feira'
+  ordem: number;
+  criadoEm: string;
+  exercicios: ExercicioDivisao[];
+}
+
+export interface PlanoTreinoCompleto {
+  id: string;
+  name: string;
+  alunoId: string;
+  professorId: string;
+  dificuldade: DificuldadeTreino;
+  diasPorSemana: number;
+  objetivo?: string | null;
+  criadoEm: string;
+  atualizadoEm: string;
+  ativo: boolean;
+  divisoes: DivisaoTreino[];
 }
 
 export interface SessaoTreino {
@@ -86,6 +128,8 @@ export interface Aluno {
   streak?: number;
   treinosMes?: number;
   ultimoTreinoEm?: string;
+  solicitacaoFichaEm?: string | null;
+  tipoSolicitacaoFicha?: 'nova' | 'atualizacao' | null;
 }
 
 export interface Equipamento {
@@ -102,6 +146,7 @@ export interface Equipamento {
   compradoEm?: string;
   notes?: string;
   imagemUrl?: string;
+  deletedAt?: string | null;
 }
 
 export interface AlertaAcademia {

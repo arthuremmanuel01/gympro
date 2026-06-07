@@ -1,5 +1,6 @@
 'use client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import type { Equipamento, StatusEquipamento } from '@/types';
 
 export function useEquipamentos() {
@@ -27,6 +28,10 @@ export function useAddEquipment() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['equipamentos'] });
+      toast.success('Equipamento cadastrado com sucesso!');
+    },
+    onError: () => {
+      toast.error('Erro ao cadastrar equipamento. Tente novamente.');
     },
   });
 }
@@ -36,11 +41,18 @@ export function useRemoveEquipment() {
   return useMutation({
     mutationFn: async (id: string) => {
       const res = await fetch(`/api/equipamentos/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Falha ao remover equipamento');
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Falha ao remover equipamento');
+      }
       return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['equipamentos'] });
+      toast.success('Equipamento removido do inventário com sucesso.');
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Erro ao remover equipamento. Tente novamente.');
     },
   });
 }
@@ -52,21 +64,30 @@ export function useUpdateEquipmentStatus() {
       id,
       status,
       notes,
+      urgencyLevel,
     }: {
       id: string;
       status: StatusEquipamento;
       notes?: string;
+      urgencyLevel?: string;
     }) => {
       const res = await fetch(`/api/equipamentos/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status, notes }),
+        body: JSON.stringify({ status, notes, urgencyLevel }),
       });
-      if (!res.ok) throw new Error('Falha ao atualizar status do equipamento');
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Falha ao atualizar status do equipamento');
+      }
       return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['equipamentos'] });
+      toast.success('Status do equipamento atualizado!');
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Erro ao atualizar equipamento.');
     },
   });
 }

@@ -8,6 +8,7 @@ export async function GET(request: NextRequest) {
   const professorId = searchParams.get('professorId');
   const cpf = searchParams.get('cpf');
   const usuarioId = searchParams.get('usuarioId');
+  const solicitacoesFicha = searchParams.get('solicitacoesFicha');
 
   try {
     if (id) {
@@ -32,6 +33,14 @@ export async function GET(request: NextRequest) {
         args: [usuarioId],
       });
       return NextResponse.json(result.rows[0] || null);
+    }
+
+    // Retorna todos os alunos com solicitação de ficha pendente (para o painel do professor)
+    if (solicitacoesFicha === 'true') {
+      const result = await db.execute(
+        'SELECT * FROM alunos WHERE solicitacaoFichaEm IS NOT NULL ORDER BY solicitacaoFichaEm ASC'
+      );
+      return NextResponse.json(result.rows);
     }
 
     let result;
@@ -107,6 +116,26 @@ export async function PATCH(request: NextRequest) {
           args: [id],
         });
         return NextResponse.json({ success: true, message: 'Vínculo removido com sucesso.' });
+      }
+
+      if (action === 'solicitar-ficha') {
+        const { tipoSolicitacao } = body;
+        if (!tipoSolicitacao || !['nova', 'atualizacao'].includes(tipoSolicitacao)) {
+          return NextResponse.json({ error: 'Tipo de solicitação inválido.' }, { status: 400 });
+        }
+        await db.execute({
+          sql: 'UPDATE alunos SET solicitacaoFichaEm = ?, tipoSolicitacaoFicha = ? WHERE id = ?',
+          args: [new Date().toISOString(), tipoSolicitacao, id],
+        });
+        return NextResponse.json({ success: true, message: 'Solicitação de ficha registrada.' });
+      }
+
+      if (action === 'cancelar-solicitacao-ficha') {
+        await db.execute({
+          sql: 'UPDATE alunos SET solicitacaoFichaEm = NULL, tipoSolicitacaoFicha = NULL WHERE id = ?',
+          args: [id],
+        });
+        return NextResponse.json({ success: true, message: 'Solicitação de ficha cancelada.' });
       }
 
       return NextResponse.json({ error: 'Ação de vínculo inválida.' }, { status: 400 });

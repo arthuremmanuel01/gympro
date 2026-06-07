@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, X, Trash2, Package, CheckCircle2 } from 'lucide-react';
 import { useEquipamentos, useAddEquipment, useRemoveEquipment } from '@/lib/queries/use-equipamentos';
+import { toast } from 'sonner';
 
 const LISTA_PADRAO = [
   { name: 'Esteira Ergométrica', category: 'Cardio' },
@@ -70,8 +71,8 @@ export default function EquipamentosPage() {
       localFinal = novoLocal;
     }
 
-    if (!nomeFinal) return alert('Defina um nome para o equipamento.');
-    if (!localFinal) return alert('Defina um local para o equipamento.');
+    if (!nomeFinal) { toast.error('Defina um nome para o equipamento.'); return; }
+    if (!localFinal) { toast.error('Defina um local para o equipamento.'); return; }
 
     await addMutation.mutateAsync({
       name: nomeFinal,
@@ -85,12 +86,11 @@ export default function EquipamentosPage() {
     setNovoNome('');
     setNovaCategoria('');
     setLocalSelecionado('');
-    setNovoLocal('');
-  };
+    setNovoLocal('');  };
 
-  const handleVender = async (id: string, nome: string) => {
+  const handleVender = (id: string, nome: string) => {
     if (window.confirm(`Tem certeza que deseja registrar a venda/remoção do equipamento: ${nome}?`)) {
-      await removeMutation.mutateAsync(id);
+      removeMutation.mutate(id);
     }
   };
 

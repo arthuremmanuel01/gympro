@@ -4,7 +4,7 @@ import { randomUUID } from 'crypto';
 
 export async function GET() {
   try {
-    const { rows } = await db.execute('SELECT * FROM equipamentos');
+    const { rows } = await db.execute('SELECT * FROM equipamentos WHERE deletedAt IS NULL');
     return NextResponse.json(rows);
   } catch (error) {
     return NextResponse.json({ error: 'Erro ao buscar equipamentos' }, { status: 500 });

@@ -1,6 +1,9 @@
 'use client';
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useEquipamentos, useUpdateEquipmentStatus } from '@/lib/queries/use-equipamentos';
 import { SkeletonCard } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
@@ -13,8 +16,27 @@ import {
   getEquipmentStatusColor,
   getEquipmentStatusLabel,
 } from '@/lib/utils';
-import { Wrench, CheckCircle2, AlertTriangle, XCircle, Settings } from 'lucide-react';
+import { Wrench, CheckCircle2, AlertTriangle, XCircle, Settings, AlertOctagon } from 'lucide-react';
 import type { Equipamento, StatusEquipamento } from '@/types';
+
+// ── Schema Zod com validação condicional de urgência ────────────────────────
+const statusSchema = z
+  .object({
+    status: z.enum(['funcionando', 'quebrado'] as const),
+    notes: z.string().optional(),
+    urgencyLevel: z.enum(['baixa', 'media', 'alta'] as const).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.status === 'quebrado' && !data.urgencyLevel) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Informe o nível de urgência do conserto.',
+        path: ['urgencyLevel'],
+      });
+    }
+  });
+
+type StatusFormData = z.infer<typeof statusSchema>;
 
 const statusIcons: Record<StatusEquipamento, React.ElementType> = {
   funcionando: CheckCircle2,
@@ -22,13 +44,30 @@ const statusIcons: Record<StatusEquipamento, React.ElementType> = {
   quebrado: XCircle,
 };
 
+const urgencyOptions = [
+  { value: 'baixa', label: '🟢 Baixa — pode aguardar', color: '#22c55e' },
+  { value: 'media', label: '🟡 Média — resolver em breve', color: '#f59e0b' },
+  { value: 'alta', label: '🔴 Alta — conserto urgente', color: '#ef4444' },
+];
+
 export default function EquipamentosPage() {
   const { data: equipamentos, isLoading: carregando } = useEquipamentos();
   const { mutate: updateStatus, isPending } = useUpdateEquipmentStatus();
   const [selected, setSelected] = useState<Equipamento | null>(null);
-  const [newStatus, setNewStatus] = useState<StatusEquipamento>('funcionando');
-  const [notes, setNotes] = useState('');
   const [filterStatus, setFilterStatus] = useState<StatusEquipamento | 'todos'>('todos');
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<StatusFormData>({
+    resolver: zodResolver(statusSchema),
+    defaultValues: { status: 'funcionando', notes: '', urgencyLevel: undefined },
+  });
+
+  const currentStatus = watch('status');
 
   const filtered =
     filterStatus === 'todos'
@@ -42,15 +81,28 @@ export default function EquipamentosPage() {
     quebrado: equipamentos?.filter((e) => e.status === 'quebrado').length ?? 0,
   };
 
-  function handleSave() {
-    if (!selected || selected.status === 'quebrado' || newStatus === 'manutencao') return;
+  function handleOpenModal(eq: Equipamento) {
+    if (eq.status === 'quebrado') return;
+    setSelected(eq);
+    reset({ status: eq.status as 'funcionando' | 'quebrado', notes: eq.notes ?? '', urgencyLevel: undefined });
+  }
+
+  function handleCloseModal() {
+    setSelected(null);
+    reset({ status: 'funcionando', notes: '', urgencyLevel: undefined });
+  }
+
+  function onSubmit(data: StatusFormData) {
+    if (!selected) return;
     updateStatus(
-      { id: selected.id, status: newStatus, notes: notes || undefined },
       {
-        onSuccess: () => {
-          setSelected(null);
-          setNotes('');
-        },
+        id: selected.id,
+        status: data.status,
+        notes: data.notes || undefined,
+        urgencyLevel: data.urgencyLevel,
+      },
+      {
+        onSuccess: () => handleCloseModal(),
       }
     );
   }
@@ -68,7 +120,7 @@ export default function EquipamentosPage() {
           <button
             key={s}
             onClick={() => setFilterStatus(s)}
-            className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors`}
+            className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors"
             style={{
               background:
                 filterStatus === s ? 'var(--color-primary)' : 'var(--color-bg-elevated)',
@@ -113,12 +165,7 @@ export default function EquipamentosPage() {
               >
                 <Card
                   interactive={eq.status !== 'quebrado'}
-                  onClick={() => {
-                    if (eq.status === 'quebrado') return;
-                    setSelected(eq);
-                    setNewStatus(eq.status);
-                    setNotes(eq.notes ?? '');
-                  }}
+                  onClick={() => handleOpenModal(eq)}
                 >
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between gap-2">
@@ -151,7 +198,9 @@ export default function EquipamentosPage() {
                           <StatusIcon className="h-3 w-3" />
                           {getEquipmentStatusLabel(eq.status)}
                         </span>
-                        <Settings className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
+                        {eq.status !== 'quebrado' && (
+                          <Settings className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
+                        )}
                       </div>
                     </div>
                   </CardContent>
@@ -162,42 +211,117 @@ export default function EquipamentosPage() {
         </div>
       )}
 
-      {/* Edit Status Modal */}
+      {/* Modal de Edição de Status — com RHF + Zod */}
       <Modal
         isOpen={!!selected}
-        onClose={() => setSelected(null)}
+        onClose={handleCloseModal}
         title={selected?.name ?? ''}
       >
-        <div className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
             {selected?.category} • {selected?.location}
           </p>
+
           <Select
             id="equipamentos-status"
             label="Novo Status"
-            value={newStatus}
-            onChange={(e) => setNewStatus(e.target.value as StatusEquipamento)}
+            {...register('status')}
             options={[
               { value: 'funcionando', label: '✅ Funcionando' },
               { value: 'quebrado', label: '❌ Quebrado' },
             ]}
           />
+
+          {/* Campo de Urgência — aparece dinamicamente quando status = 'quebrado' */}
+          <AnimatePresence>
+            {currentStatus === 'quebrado' && (
+              <motion.div
+                key="urgency-field"
+                initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                animate={{ opacity: 1, height: 'auto', marginTop: 16 }}
+                exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                transition={{ duration: 0.2 }}
+                style={{ overflow: 'hidden' }}
+              >
+                <div
+                  className="p-3 rounded-xl space-y-3"
+                  style={{
+                    background: 'rgba(239, 68, 68, 0.06)',
+                    border: '1px solid rgba(239, 68, 68, 0.2)',
+                  }}
+                >
+                  <div className="flex items-center gap-2">
+                    <AlertOctagon className="h-4 w-4 text-red-400" />
+                    <p className="text-xs font-bold text-red-400">
+                      Nível de Urgência do Conserto *
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    {urgencyOptions.map((opt) => {
+                      const isSelected = watch('urgencyLevel') === opt.value;
+                      return (
+                        <label
+                          key={opt.value}
+                          className="cursor-pointer"
+                        >
+                          <input
+                            type="radio"
+                            value={opt.value}
+                            {...register('urgencyLevel')}
+                            className="sr-only"
+                          />
+                          <div
+                            className="text-center text-xs font-semibold py-2 px-1 rounded-lg border transition-all"
+                            style={{
+                              background: isSelected ? `${opt.color}20` : 'var(--color-bg-elevated)',
+                              borderColor: isSelected ? opt.color : 'var(--color-border-subtle)',
+                              color: isSelected ? opt.color : 'var(--color-text-muted)',
+                              transform: isSelected ? 'scale(1.03)' : 'scale(1)',
+                            }}
+                          >
+                            {opt.value === 'baixa' ? '🟢' : opt.value === 'media' ? '🟡' : '🔴'}
+                            <br />
+                            {opt.value.charAt(0).toUpperCase() + opt.value.slice(1)}
+                          </div>
+                        </label>
+                      );
+                    })}
+                  </div>
+                  {errors.urgencyLevel && (
+                    <p className="text-xs text-red-400 font-medium">
+                      {errors.urgencyLevel.message}
+                    </p>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <Textarea
             id="equipamentos-notes"
             label="Observações"
             placeholder="Descreva o problema ou status..."
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
+            {...register('notes')}
           />
+
           <div className="flex gap-3">
-            <Button variant="outline" className="flex-1" onClick={() => setSelected(null)}>
+            <Button
+              type="button"
+              variant="outline"
+              className="flex-1"
+              onClick={handleCloseModal}
+            >
               Cancelar
             </Button>
-            <Button className="flex-1" onClick={handleSave} carregando={isPending}>
+            <Button
+              type="submit"
+              className="flex-1"
+              carregando={isPending}
+            >
               Salvar Status
             </Button>
           </div>
-        </div>
+        </form>
       </Modal>
     </div>
   );

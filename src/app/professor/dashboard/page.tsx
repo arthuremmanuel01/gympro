@@ -3,18 +3,20 @@ import { motion } from 'framer-motion';
 import { useEffect } from 'react';
 import { useAutenticacaoStore } from '@/lib/store/auth-store';
 import { useStudentsByProfessor } from '@/lib/queries/use-alunos';
+import { useSolicitacoesFicha } from '@/lib/queries/use-solicitacoes-ficha';
 import { useAlertsStore } from '@/lib/store/alertas-store';
 import { SkeletonList } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar } from '@/components/shared/avatar';
 import { PageHeader } from '@/components/shared/page-header';
 import { getPaymentStatusBg, getPaymentStatusLabel } from '@/lib/utils';
-import { Users, Dumbbell, Bell, ChevronRight } from 'lucide-react';
+import { Users, Dumbbell, Bell, ChevronRight, ClipboardList } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ProfessorDashboardPage() {
   const { user } = useAutenticacaoStore();
   const { data: alunos, isLoading: carregando } = useStudentsByProfessor(user?.id ?? '');
+  const { data: solicitacoesFicha } = useSolicitacoesFicha();
   
   const fetchAlerts = useAlertsStore((s) => s.fetchAlerts);
   const quantidadeNaoLida = useAlertsStore((s) => s.getUnreadCount)();
@@ -56,11 +58,12 @@ export default function ProfessorDashboardPage() {
             bg: 'rgba(16, 185, 129, 0.15)',
           },
           {
-            label: 'Inadimplentes',
-            value: alunos?.filter((s) => s.statusPagamento === 'inadimplente').length ?? 0,
-            icon: Bell,
-            color: '#ef4444',
-            bg: 'rgba(239, 68, 68, 0.15)',
+            label: 'Fichas Pendentes',
+            value: solicitacoesFicha?.length ?? 0,
+            icon: ClipboardList,
+            color: '#f59e0b',
+            bg: 'rgba(245, 158, 11, 0.15)',
+            href: '/professor/alunos',
           },
           {
             label: 'Alertas Não Lidos',

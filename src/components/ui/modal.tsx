@@ -58,7 +58,7 @@ export function Modal({ isOpen, onClose, title, children, size = 'md', className
             exit={{ opacity: 0, y: 40, scale: 0.97 }}
             transition={{ duration: 0.25, type: 'spring', stiffness: 300, damping: 28 }}
             className={cn(
-              'glass-elevated rounded-t-2xl sm:rounded-2xl w-full shadow-2xl',
+              'glass-elevated rounded-t-2xl sm:rounded-2xl w-full shadow-2xl flex flex-col max-h-[90vh]',
               sizes[size],
               className
             )}
@@ -75,7 +75,7 @@ export function Modal({ isOpen, onClose, title, children, size = 'md', className
                 </button>
               </div>
             )}
-            <div className="p-6">{children}</div>
+            <div className="p-6 overflow-y-auto">{children}</div>
           </motion.div>
         </motion.div>
       )}

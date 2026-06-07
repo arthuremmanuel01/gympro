@@ -20,21 +20,18 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
-const roleConfig: Record<Perfil, { label: string; color: string; hint: string }> = {
+const roleConfig: Record<Perfil, { label: string; color: string }> = {
   aluno: {
     label: 'Aluno',
     color: 'var(--color-primary)',
-    hint: 'Ex: arthur@gympro.com / 123456',
   },
   professor: {
     label: 'Professor',
     color: '#6366f1',
-    hint: 'Ex: enrico@gympro.com / 123456',
   },
   gerencia: {
     label: 'Gerência',
     color: 'var(--color-accent)',
-    hint: 'Ex: luizfelipe@gympro.com / 123456',
   },
 };
 
@@ -131,19 +128,6 @@ function LoginForm() {
               {config.label}
             </span>
           </p>
-        </div>
-
-        {/* demo */}
-        <div
-          className="rounded-xl p-3 mb-6 flex items-start gap-2 text-xs"
-          style={{
-            background: 'var(--color-bg-elevated)',
-            border: '1px solid var(--color-border-subtle)',
-            color: 'var(--color-text-muted)',
-          }}
-        >
-          <span className="text-base">💡</span>
-          <span>{config.hint}</span>
         </div>
 
         {/* Form */}
