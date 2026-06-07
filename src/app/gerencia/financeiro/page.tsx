@@ -8,14 +8,20 @@ import { Button } from '@/components/ui/button';
 import { Avatar } from '@/components/shared/avatar';
 import { PageHeader } from '@/components/shared/page-header';
 import { formatCurrency, formatDate, getPaymentStatusBg, getPaymentStatusLabel } from '@/lib/utils';
-import { CheckCircle2, AlertCircle, Clock, DollarSign } from 'lucide-react';
+import { Modal } from '@/components/ui/modal';
+import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
+import { CheckCircle2, AlertCircle, Clock, DollarSign, Trash2 } from 'lucide-react';
 import type { StatusPagamento } from '@/types';
 
 export default function FinanceiroPage() {
   const { data: alunos, isLoading: carregando } = useAlunos();
   const { mutate: updateStatus, isPending } = useUpdatePaymentStatus();
+  const queryClient = useQueryClient();
   const [filter, setFilter] = useState<StatusPagamento | 'todos'>('todos');
   const [updating, setUpdating] = useState<string | null>(null);
+  const [alunoExcluir, setAlunoExcluir] = useState<{id: string, name: string} | null>(null);
+  const [excluindo, setExcluindo] = useState(false);
 
   const filtered = filter === 'todos' ? alunos : alunos?.filter((s) => s.statusPagamento === filter);
 
@@ -35,6 +41,22 @@ export default function FinanceiroPage() {
   function handleUpdateStatus(alunoId: string, status: StatusPagamento) {
     setUpdating(alunoId);
     updateStatus({ id: alunoId, status }, { onSettled: () => setUpdating(null) });
+  }
+
+  async function handleExcluirAluno() {
+    if (!alunoExcluir) return;
+    setExcluindo(true);
+    try {
+      const res = await fetch(`/api/alunos/${alunoExcluir.id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error();
+      toast.success('Aluno excluído com sucesso.');
+      setAlunoExcluir(null);
+      queryClient.invalidateQueries({ queryKey: ['alunos'] });
+    } catch {
+      toast.error('Erro ao excluir aluno. Tente novamente mais tarde.');
+    } finally {
+      setExcluindo(false);
+    }
   }
 
   return (
@@ -95,11 +117,17 @@ export default function FinanceiroPage() {
                       <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ring-1 ring-inset ${getPaymentStatusBg(student.statusPagamento)}`}>
                         {getPaymentStatusLabel(student.statusPagamento)}
                       </span>
-                      {student.statusPagamento !== 'adimplente' && (
-                        <Button size="sm" variant="ghost" carregando={updating === student.id && isPending} onClick={() => handleUpdateStatus(student.id, 'adimplente')} className="text-xs h-7 px-2">
-                          Regularizar
+                      <div className="flex items-center gap-2">
+                        {student.statusPagamento !== 'adimplente' && (
+                          <Button size="sm" variant="ghost" carregando={updating === student.id && isPending} onClick={() => handleUpdateStatus(student.id, 'adimplente')} className="text-xs h-7 px-2">
+                            Regularizar
+                          </Button>
+                        )}
+                        <Button size="sm" variant="danger" className="h-7 px-2 text-xs" onClick={() => setAlunoExcluir({ id: student.id, name: student.name })}>
+                          <Trash2 className="h-3.5 w-3.5 sm:mr-1" />
+                          <span className="hidden sm:inline">Excluir</span>
                         </Button>
-                      )}
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -108,6 +136,30 @@ export default function FinanceiroPage() {
           ))}
         </div>
       )}
+
+      <Modal isOpen={!!alunoExcluir} onClose={() => setAlunoExcluir(null)} title="Excluir Aluno Permanentemente">
+        <div className="space-y-4">
+          <p className="text-sm text-red-400 font-semibold">
+            Tem certeza que deseja excluir o aluno {alunoExcluir?.name}?
+          </p>
+          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+            Esta ação não pode ser desfeita. Todo o histórico de treinos, fichas, e a conta do aluno serão apagados.
+          </p>
+          <div className="flex gap-3 pt-2">
+            <Button variant="outline" className="flex-1" onClick={() => setAlunoExcluir(null)} disabled={excluindo}>
+              Cancelar
+            </Button>
+            <Button
+              className="flex-1 bg-red-500 hover:bg-red-600 text-white"
+              onClick={handleExcluirAluno}
+              carregando={excluindo}
+              leftIcon={<Trash2 className="h-4 w-4" />}
+            >
+              Sim, Excluir
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

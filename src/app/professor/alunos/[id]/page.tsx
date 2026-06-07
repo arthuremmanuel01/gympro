@@ -427,11 +427,8 @@ export default function StudentDetailPage({ params }: PageProps) {
   const { data: plano, isLoading: loadingPlano } = usePlanoTreinoCompleto(student?.planoTreinoAtivoId);
   const { mutate: criarPlano, isPending: criando } = useCriarPlanoCompleto();
   const { mutate: atualizarPlano, isPending: atualizando } = useAtualizarPlanoCompleto();
-
   const [fichaModal, setFichaModal] = useState(false);
   const [modoEditar, setModoEditar] = useState(false);
-  const [excluirModal, setExcluirModal] = useState(false);
-  const [excluindo, setExcluindo] = useState(false);
 
   const isPending = criando || atualizando;
 
@@ -536,22 +533,7 @@ export default function StudentDetailPage({ params }: PageProps) {
     }
   }
 
-  async function handleExcluirAluno() {
-    if (!student) return;
-    setExcluindo(true);
-    try {
-      const res = await fetch(`/api/alunos/${student.id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error();
-      toast.success('Aluno excluído com sucesso.');
-      setExcluirModal(false);
-      queryClient.invalidateQueries({ queryKey: ['alunos'] });
-      router.push('/professor/alunos');
-    } catch {
-      toast.error('Erro ao excluir aluno. Tente novamente mais tarde.');
-    } finally {
-      setExcluindo(false);
-    }
-  }
+
 
   if (loadingStudent) return <SkeletonCard lines={5} />;
   if (!student) return <div style={{ color: 'var(--color-text-muted)' }}>Aluno não encontrado.</div>;
@@ -707,55 +689,6 @@ export default function StudentDetailPage({ params }: PageProps) {
       </motion.div>
 
 
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-        <Card className="border-red-500/30">
-          <CardContent className="p-4">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div>
-                <h3 className="text-sm font-bold text-red-400 flex items-center gap-2">
-                  <AlertCircle className="h-4 w-4" /> Zona de Risco (Excluir Aluno)
-                </h3>
-                <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>
-                  A exclusão do aluno é irreversível e apagará permanentemente todos os dados vinculados a ele (fichas, treinos e conta).
-                </p>
-              </div>
-              <Button
-                type="button"
-                variant="danger"
-                className="w-full sm:w-auto whitespace-nowrap flex-shrink-0"
-                onClick={() => setExcluirModal(true)}
-              >
-                Excluir Aluno
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-
-
-      <Modal isOpen={excluirModal} onClose={() => setExcluirModal(false)} title="Excluir Aluno Permanentemente">
-        <div className="space-y-4">
-          <p className="text-sm text-red-400 font-semibold">
-            Tem certeza que deseja excluir o aluno {student?.name}?
-          </p>
-          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-            Esta ação não pode ser desfeita. Todo o histórico de treinos, fichas, e a conta do aluno serão apagados.
-          </p>
-          <div className="flex gap-3 pt-2">
-            <Button variant="outline" className="flex-1" onClick={() => setExcluirModal(false)} disabled={excluindo}>
-              Cancelar
-            </Button>
-            <Button
-              className="flex-1 bg-red-500 hover:bg-red-600 text-white"
-              onClick={handleExcluirAluno}
-              carregando={excluindo}
-              leftIcon={<Trash2 className="h-4 w-4" />}
-            >
-              Sim, Excluir Aluno
-            </Button>
-          </div>
-        </div>
-      </Modal>
 
 
       <Modal
