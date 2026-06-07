@@ -721,8 +721,8 @@ export default function StudentDetailPage({ params }: PageProps) {
               </div>
               <Button
                 type="button"
-                className="w-full sm:w-auto text-red-400 hover:text-white"
-                style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)' }}
+                variant="danger"
+                className="w-full sm:w-auto whitespace-nowrap flex-shrink-0"
                 onClick={() => setExcluirModal(true)}
               >
                 Excluir Aluno
