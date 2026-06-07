@@ -1,8 +1,10 @@
 import { createClient, type Client } from '@libsql/client';
 
 export const db: Client = createClient({
-  url: 'file:gympro.db',
+  url: process.env.TURSO_DATABASE_URL || 'file:gympro.db',
+  authToken: process.env.TURSO_AUTH_TOKEN,
 });
+
 
 export async function inicializarSchema(): Promise<void> {
   try {
@@ -55,7 +57,7 @@ export async function inicializarSchema(): Promise<void> {
     `);
 
     // Migrações em planos_treino existentes
-    try { await db.execute(`ALTER TABLE planos_treino ADD COLUMN objetivo TEXT`); } catch (_) {}
+    try { await db.execute(`ALTER TABLE planos_treino ADD COLUMN objetivo TEXT`); } catch (_) { }
 
     // ── Divisões de Treino (Nível 2) ──────────────────────────────────────────
     await db.execute(`
